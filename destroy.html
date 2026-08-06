@@ -45,42 +45,15 @@ TikTok运营系统
 
 
 
-<div class="menu">
 
+<!-- 动态导航 -->
 
-<a href="index.html" class="menu-item">
-
-🏠 首页
-
-</a>
-
-
-
-<a href="height.html" class="menu-item">
-
-📏 身高体重换算
-
-</a>
-
-
-
-<a href="commission.html" class="menu-item">
-
-💰 当月TC预估
-
-</a>
-
-
-
-<a href="destroy.html" class="menu-item active">
-
-🗑️ 销毁费用预估
-
-</a>
-
+<div class="menu" id="menu">
 
 
 </div>
+
+
 
 
 
@@ -108,11 +81,6 @@ Ian OS v1.0
 
 
 <div class="container">
-
-
-
-
-
 
 
 
@@ -161,7 +129,11 @@ Ian OS v1.0
 
 
 
+
+
+
 <div class="input-row">
+
 
 
 <div>
@@ -175,15 +147,22 @@ USD / CNY 汇率
 
 
 <input
+
 id="exchange-rate"
+
 type="number"
+
 placeholder="例如 7.15">
 
 
 </div>
 
 
+
 </div>
+
+
+
 
 
 
@@ -214,7 +193,9 @@ placeholder="例如 7.15">
 
 
 
+
 <div class="input-row">
+
 
 
 <div>
@@ -228,12 +209,19 @@ placeholder="例如 7.15">
 
 
 <input
+
 id="goods-cost"
+
 type="number"
+
 placeholder="例如35">
 
 
 </div>
+
+
+
+
 
 
 
@@ -249,12 +237,16 @@ placeholder="例如35">
 
 
 <input
+
 id="quantity"
+
 type="number"
+
 placeholder="例如100">
 
 
 </div>
+
 
 
 </div>
@@ -270,6 +262,7 @@ placeholder="例如100">
 <div class="input-row">
 
 
+
 <div>
 
 
@@ -281,12 +274,18 @@ placeholder="例如100">
 
 
 <input
+
 id="weight"
+
 type="number"
+
 placeholder="例如350">
 
 
 </div>
+
+
+
 
 
 
@@ -303,12 +302,16 @@ placeholder="例如350">
 
 
 <input
+
 id="destroy-fee"
+
 type="number"
+
 placeholder="例如0.55">
 
 
 </div>
+
 
 
 </div>
@@ -324,6 +327,7 @@ placeholder="例如0.55">
 <div class="input-row">
 
 
+
 <div>
 
 
@@ -335,12 +339,16 @@ placeholder="例如0.55">
 
 
 <input
+
 id="outbound-fee"
+
 type="number"
+
 placeholder="例如0.4">
 
 
 </div>
+
 
 
 </div>
@@ -361,10 +369,14 @@ placeholder="例如0.4">
 
 
 <button
+
 class="calculate-btn"
+
 onclick="calculateDestroy()">
 
+
 计算销毁费用
+
 
 </button>
 
@@ -387,11 +399,15 @@ onclick="calculateDestroy()">
 
 
 
+
+
 <p id="destroy-result">
 
 等待计算...
 
 </p>
+
+
 
 
 
@@ -423,6 +439,8 @@ onclick="calculateDestroy()">
 
 
 <script src="destroy.js"></script>
+
+<script src="nav.js"></script>
 
 
 </body>

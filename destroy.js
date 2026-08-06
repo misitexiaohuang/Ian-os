@@ -380,13 +380,15 @@ function loadDestroyData(){
 // 页面加载
 // =======================
 
-window.onload=function(){
+document.addEventListener(
+"DOMContentLoaded",
+function(){
 
 
     loadDestroyData();
 
 
-};
+});
 
 
 

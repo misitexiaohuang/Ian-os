@@ -45,42 +45,15 @@ TikTok运营系统
 
 
 
-<div class="menu">
 
+<!-- 动态导航 -->
 
-<a href="index.html" class="menu-item">
-
-🏠 首页
-
-</a>
-
-
-
-<a href="height.html" class="menu-item">
-
-📏 身高体重换算
-
-</a>
-
-
-
-<a href="commission.html" class="menu-item active">
-
-💰 当月TC预估
-
-</a>
-
-
-
-<a href="destroy.html" class="menu-item">
-
-🗑️ 销毁费用预估
-
-</a>
-
+<div class="menu" id="menu">
 
 
 </div>
+
+
 
 
 
@@ -108,9 +81,6 @@ Ian OS v1.0
 
 
 <div class="container">
-
-
-
 
 
 
@@ -159,19 +129,26 @@ Ian OS v1.0
 
 
 
+
+
 <div class="input-row">
+
 
 
 <div>
 
 
 <label>
+
 选择月份
+
 </label>
 
 
-<input 
+<input
+
 id="month"
+
 type="month">
 
 
@@ -181,24 +158,35 @@ type="month">
 
 
 
+
+
 <div>
 
 
 <label>
+
 USD / CNY 汇率
+
 </label>
 
 
-<input 
+<input
+
 id="exchange-rate"
+
 type="number"
+
 placeholder="例如 7.15">
 
 
 </div>
 
 
+
 </div>
+
+
+
 
 
 </div>
@@ -225,7 +213,12 @@ placeholder="例如 7.15">
 
 
 
+
+
+
+
 <div class="input-row">
+
 
 
 <div>
@@ -239,8 +232,11 @@ placeholder="例如 7.15">
 
 
 <input
+
 id="default-money"
+
 type="number"
+
 placeholder="例如 500">
 
 
@@ -250,14 +246,20 @@ placeholder="例如 500">
 
 
 
+
+
 <div style="display:flex;align-items:end;">
 
 
 <button
+
 onclick="fillDailyMoney()"
+
 class="calculate-btn">
 
+
 自动填充
+
 
 </button>
 
@@ -265,7 +267,9 @@ class="calculate-btn">
 </div>
 
 
+
 </div>
+
 
 
 
@@ -281,20 +285,28 @@ class="calculate-btn">
 
 <thead>
 
+
 <tr>
 
+
 <th>
+
 日期
+
 </th>
 
 
 <th>
+
 结算金额 ($)
+
 </th>
 
 
 <th>
+
 销量
+
 </th>
 
 
@@ -316,6 +328,9 @@ class="calculate-btn">
 
 
 </div>
+
+
+
 
 
 
@@ -343,6 +358,8 @@ class="calculate-btn">
 
 
 
+
+
 <p id="money-result">
 
 等待输入结算金额...
@@ -351,11 +368,15 @@ class="calculate-btn">
 
 
 
+
+
 <p id="sales-result">
 
 等待输入销量...
 
 </p>
+
+
 
 
 
@@ -386,6 +407,8 @@ class="calculate-btn">
 
 
 
+
+
 <div class="input-row">
 
 
@@ -400,12 +423,17 @@ class="calculate-btn">
 
 
 <input
+
 id="product-cost"
+
 type="number"
+
 placeholder="例如 35">
 
 
 </div>
+
+
 
 
 
@@ -422,12 +450,16 @@ placeholder="例如 35">
 
 
 <input
+
 id="ads-cost"
+
 type="number"
+
 placeholder="例如 1000">
 
 
 </div>
+
 
 
 </div>
@@ -454,11 +486,16 @@ placeholder="例如 1000">
 
 
 <input
+
 id="warehouse-cost"
+
 type="number">
 
 
 </div>
+
+
+
 
 
 
@@ -474,7 +511,9 @@ type="number">
 
 
 <input
+
 id="shipping-cost"
+
 type="number">
 
 
@@ -506,11 +545,16 @@ type="number">
 
 
 <input
+
 id="sample-cost"
+
 type="number">
 
 
 </div>
+
+
+
 
 
 
@@ -526,7 +570,9 @@ type="number">
 
 
 <input
+
 id="other-cost"
+
 type="number">
 
 
@@ -535,6 +581,7 @@ type="number">
 
 
 </div>
+
 
 
 
@@ -557,12 +604,18 @@ type="number">
 
 
 <input
+
 id="social-security-cost"
+
 type="number"
+
 placeholder="例如 500">
 
 
 </div>
+
+
+
 
 
 
@@ -578,8 +631,11 @@ placeholder="例如 500">
 
 
 <input
+
 id="deduction-cost"
+
 type="number"
+
 placeholder="例如 1000">
 
 
@@ -588,6 +644,7 @@ placeholder="例如 1000">
 
 
 </div>
+
 
 
 
@@ -604,10 +661,14 @@ placeholder="例如 1000">
 
 
 <button
+
 onclick="calculateTC()"
+
 class="calculate-btn">
 
+
 计算TC
+
 
 </button>
 
@@ -630,11 +691,15 @@ class="calculate-btn">
 
 
 
+
+
 <p id="commission-result">
 
 等待计算...
 
 </p>
+
+
 
 
 
@@ -664,7 +729,10 @@ class="calculate-btn">
 
 
 
+
 <script src="commission.js"></script>
+
+<script src="nav.js"></script>
 
 
 </body>

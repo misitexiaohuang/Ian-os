@@ -18,10 +18,9 @@ body{
     Arial,
     sans-serif;
 
-    font-size:14px;
+    font-size:15px;
 
 }
-
 
 
 /* =====================
@@ -39,8 +38,6 @@ body{
 
 
 
-
-
 /* =====================
 左侧导航
 ===================== */
@@ -48,7 +45,7 @@ body{
 
 .sidebar{
 
-    width:220px;
+    width:240px;
 
     background:#1f2329;
 
@@ -62,7 +59,7 @@ body{
 
     bottom:0;
 
-    padding:25px 15px;
+    padding:28px 18px;
 
 }
 
@@ -73,7 +70,7 @@ body{
 
     margin:0;
 
-    font-size:24px;
+    font-size:25px;
 
     font-weight:700;
 
@@ -96,9 +93,11 @@ body{
 
 .menu{
 
-    margin-top:35px;
+    margin-top:40px;
 
 }
+
+
 
 
 
@@ -106,15 +105,21 @@ body{
 
     display:block;
 
-    padding:11px 14px;
+    padding:12px 14px;
 
-    margin-bottom:6px;
+    margin-bottom:7px;
 
-    border-radius:6px;
+    border-radius:8px;
 
     text-decoration:none;
 
     color:#c9cdd4;
+
+    font-size:15px;
+
+    cursor:grab;
+
+    user-select:none;
 
 }
 
@@ -159,8 +164,6 @@ body{
 
 
 
-
-
 /* =====================
 右侧区域
 ===================== */
@@ -168,9 +171,9 @@ body{
 
 .content{
 
-    margin-left:220px;
+    margin-left:240px;
 
-    width:calc(100% - 220px);
+    width:calc(100% - 240px);
 
     min-height:100vh;
 
@@ -190,11 +193,9 @@ body{
 
     width:100%;
 
-    max-width:900px;
+    max-width:1100px;
 
 }
-
-
 
 
 
@@ -211,11 +212,11 @@ body{
 
     border:1px solid #e5e6eb;
 
-    border-radius:8px;
+    border-radius:12px;
 
-    padding:25px;
+    padding:30px;
 
-    margin-bottom:25px;
+    margin-bottom:30px;
 
 }
 
@@ -225,7 +226,7 @@ body{
 
     margin:0;
 
-    font-size:26px;
+    font-size:30px;
 
 }
 
@@ -235,8 +236,9 @@ body{
 
     color:#86909c;
 
-}
+    font-size:15px;
 
+}
 
 
 
@@ -249,11 +251,11 @@ body{
 
     grid-template-columns:
 
-    repeat(3,260px);
+    repeat(3,300px);
 
     justify-content:center;
 
-    gap:20px;
+    gap:25px;
 
 }
 
@@ -262,20 +264,18 @@ body{
 
 
 
-/* 首页卡片 */
-
 .tool-grid .tool-card{
 
 
-    height:180px;
+    height:200px;
 
     background:white;
 
     border:1px solid #e5e6eb;
 
-    border-radius:8px;
+    border-radius:14px;
 
-    padding:22px;
+    padding:26px;
 
     text-decoration:none;
 
@@ -300,11 +300,14 @@ body{
 
 
 
+
 .tool-grid .tool-icon{
 
-    font-size:28px;
 
-    margin-bottom:18px;
+    font-size:34px;
+
+    margin-bottom:20px;
+
 
 }
 
@@ -312,11 +315,14 @@ body{
 
 
 
+
 .tool-grid .tool-card h2{
 
-    margin:0 0 8px;
 
-    font-size:17px;
+    margin:0 0 10px;
+
+    font-size:19px;
+
 
 }
 
@@ -326,21 +332,17 @@ body{
 
 .tool-grid .tool-card p{
 
+
     margin:0;
 
     color:#86909c;
 
+    font-size:14px;
+
     line-height:1.5;
 
+
 }
-
-
-
-
-
-
-
-
 
 /* =====================
 工具页面
@@ -364,7 +366,7 @@ body{
 
 .hero{
 
-    margin-bottom:30px;
+    margin-bottom:25px;
 
 }
 
@@ -374,7 +376,7 @@ body{
 
     margin:0 0 10px;
 
-    font-size:30px;
+    font-size:32px;
 
 }
 
@@ -386,6 +388,8 @@ body{
 
     color:#86909c;
 
+    font-size:15px;
+
 }
 
 
@@ -394,7 +398,9 @@ body{
 
 
 
-/* 工具输入卡片 */
+/* =====================
+工具卡片
+===================== */
 
 
 .container > .tool-card{
@@ -404,9 +410,9 @@ body{
 
     border:1px solid #e5e6eb;
 
-    border-radius:8px;
+    border-radius:12px;
 
-    padding:30px;
+    padding:25px;
 
     margin-bottom:20px;
 
@@ -424,9 +430,9 @@ body{
 
     border:1px solid #e5e6eb;
 
-    border-radius:8px;
+    border-radius:12px;
 
-    padding:30px;
+    padding:25px;
 
 
 }
@@ -435,14 +441,13 @@ body{
 
 
 
-
-
 /* =====================
-输入
+输入区域
 ===================== */
 
 
 .input-row{
+
 
     display:flex;
 
@@ -450,13 +455,16 @@ body{
 
     margin-bottom:18px;
 
+
 }
 
 
 
 .input-row > div{
 
+
     flex:1;
+
 
 }
 
@@ -464,13 +472,19 @@ body{
 
 label{
 
+
     display:block;
 
     color:#4e5969;
 
     margin-bottom:7px;
 
+    font-size:15px;
+
+
 }
+
+
 
 
 
@@ -483,9 +497,11 @@ input{
 
     border:1px solid #c9cdd4;
 
-    border-radius:6px;
+    border-radius:8px;
 
     padding:0 12px;
+
+    font-size:15px;
 
 
 }
@@ -494,9 +510,11 @@ input{
 
 input:focus{
 
+
     outline:none;
 
     border-color:#1677ff;
+
 
 }
 
@@ -524,19 +542,26 @@ input:focus{
 
     border:none;
 
-    border-radius:6px;
+    border-radius:8px;
 
     cursor:pointer;
 
+    font-size:15px;
+
 
 }
+
 
 
 .calculate-btn:hover{
 
+
     background:#0e5fd8;
 
+
 }
+
+
 
 
 
@@ -550,27 +575,52 @@ input:focus{
 
 .table-box{
 
+
     overflow:auto;
 
+
 }
+
+
 
 
 
 table{
 
+
     width:100%;
 
     border-collapse:collapse;
 
+    font-size:15px;
+
+
 }
+
+
 
 
 
 th,td{
 
+
     padding:12px;
 
     border-bottom:1px solid #eee;
+
+
+}
+
+
+
+
+table th{
+
+
+    text-align:center;
+
+    vertical-align:middle;
+
 
 }
 
@@ -578,28 +628,439 @@ th,td{
 
 
 
+.table-input{
+
+
+    width:100%;
+
+    height:36px;
+
+    border:1px solid #e5e6eb;
+
+    border-radius:7px;
+
+    padding:0 10px;
+
+    background:white;
+
+    font-size:14px;
+
+
+}
+
+
+
+
+.table-input:focus{
+
+
+    border-color:#1677ff;
+
+    outline:none;
+
+
+}
+
+
+
+
+
+
+
+/* =====================
+结果区域
+===================== */
+
+
+.result-box h2,
+.result-box h3{
+
+
+    font-size:20px;
+
+    margin-top:0;
+
+
+}
+
+
+
+
+.result-box p{
+
+
+    font-size:15px;
+
+    line-height:1.8;
+
+
+}
+
+
+
+
+
+
+/* =====================
+普通卡片标题
+===================== */
+
+
+.tool-card h2{
+
+
+    font-size:20px;
+
+
+}
+
+
+
+.tool-card p{
+
+
+    font-size:15px;
+
+    line-height:1.6;
+
+
+}
+
+
+
+
+
+
+/* =====================
+日期选择优化
+===================== */
+
+
+input[type="month"],
+input[type="date"]{
+
+
+    cursor:pointer;
+
+
+}
+
+/* =====================
+寄样审核状态
+===================== */
+
+
+.sample-green{
+
+    color:#00a870;
+
+    font-weight:600;
+
+}
+
+
+
+.sample-yellow{
+
+    color:#d89614;
+
+    font-weight:600;
+
+}
+
+
+
+.sample-red{
+
+    color:#f53f3f;
+
+    font-weight:600;
+
+}
+
+
+
+
+
+
+/* =====================
+删除按钮
+===================== */
+
+
+table button{
+
+
+    border:none;
+
+    background:#f2f3f5;
+
+    padding:7px 12px;
+
+    border-radius:7px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+
+}
+
+
+
+table button:hover{
+
+
+    background:#e5e6eb;
+
+
+}
+
+
+
+
+
+
+
+/* =====================
+寄样审核表格宽度
+===================== */
+
+
+#sample-list th:nth-child(1),
+#sample-list td:nth-child(1){
+
+
+    width:160px;
+
+
+}
+
+
+
+
+
+#sample-list th:nth-child(2),
+#sample-list td:nth-child(2){
+
+
+    width:180px;
+
+
+}
+
+
+
+
+
+#sample-list th:nth-child(3),
+#sample-list td:nth-child(3){
+
+
+    width:140px;
+
+    text-align:center;
+
+
+}
+
+
+
+
+
+#sample-list th:nth-child(4),
+#sample-list td:nth-child(4){
+
+
+    width:140px;
+
+    text-align:center;
+
+
+}
+
+
+
+
+
+#sample-list th:nth-child(5),
+#sample-list td:nth-child(5){
+
+
+    width:400px;
+
+
+}
+
+
+
+
+
+#sample-list td:nth-child(5) input{
+
+
+    width:100%;
+
+    min-width:350px;
+
+
+}
+
+
+
+
+
+
+#sample-list th:nth-child(6),
+#sample-list td:nth-child(6){
+
+
+    width:80px;
+
+    text-align:center;
+
+
+}
+
+
+
+
+
+
+
+
+/* =====================
+排序区域
+===================== */
+
+
+.list-header{
+
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+
+}
+
+
+
+
+.sort-box{
+
+
+    display:flex;
+
+    gap:10px;
+
+
+}
+
+
+
+
+.sort-box button{
+
+
+    border:1px solid #e5e6eb;
+
+    background:white;
+
+    padding:8px 14px;
+
+    border-radius:7px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+
+}
+
+
+
+
+
+.sort-box button:hover{
+
+
+    border-color:#1677ff;
+
+    color:#1677ff;
+
+
+}
+
+
+
+
+
+
+
+
+/* =====================
+导航拖动效果
+===================== */
+
+
+.menu-item:active{
+
+
+    cursor:grabbing;
+
+
+}
+
+
+
+
+
+
+
+
+/* =====================
+移动端适配
+===================== */
 
 
 @media(max-width:900px){
 
 
+
 .sidebar{
+
 
     position:relative;
 
     width:100%;
 
+    height:auto;
+
+
 }
+
+
 
 
 .app-layout{
 
+
     flex-direction:column;
+
 
 }
 
 
+
+
+
 .content{
+
 
     margin-left:0;
 
@@ -607,92 +1068,8 @@ th,td{
 
     padding:20px;
 
-}
-
-
-.tool-grid{
-
-    grid-template-columns:1fr;
 
 }
-
-
-.input-row{
-
-    flex-direction:column;
-
-}
-
-
-}
-
-/* =====================
-ERP尺寸优化
-===================== */
-
-
-/* 左侧导航放大 */
-
-.sidebar{
-
-    width:260px;
-
-    padding:30px 20px;
-
-}
-
-
-
-.brand h2{
-
-    font-size:28px;
-
-}
-
-
-
-.brand p{
-
-    font-size:14px;
-
-}
-
-
-
-
-.menu{
-
-    margin-top:45px;
-
-}
-
-
-
-.menu-item{
-
-    padding:14px 16px;
-
-    font-size:15px;
-
-    border-radius:8px;
-
-}
-
-
-
-
-/* 右侧区域 */
-
-.content{
-
-    margin-left:260px;
-
-    width:calc(100% - 260px);
-
-    padding:50px;
-
-}
-
 
 
 
@@ -700,64 +1077,19 @@ ERP尺寸优化
 
 .container{
 
-    max-width:1100px;
+
+    max-width:100%;
+
 
 }
 
 
-
-
-
-
-
-/* 首页顶部 */
-
-
-.dashboard-header{
-
-    padding:35px;
-
-    border-radius:12px;
-
-    margin-bottom:35px;
-
-}
-
-
-
-.dashboard-header h1{
-
-    font-size:34px;
-
-}
-
-
-
-.dashboard-header p{
-
-    font-size:16px;
-
-}
-
-
-
-
-
-
-
-
-/* 首页卡片 */
 
 
 .tool-grid{
 
 
-    grid-template-columns:
-
-    repeat(3,300px);
-
-
-    gap:30px;
+    grid-template-columns:1fr;
 
 
 }
@@ -765,26 +1097,15 @@ ERP尺寸优化
 
 
 
-.tool-grid .tool-card{
+
+.input-row{
 
 
-    height:220px;
-
-    padding:30px;
-
-    border-radius:14px;
+    flex-direction:column;
 
 
 }
 
-
-
-.tool-grid .tool-icon{
-
-
-    font-size:38px;
-
-    margin-bottom:25px;
 
 
 }
@@ -792,13 +1113,19 @@ ERP尺寸优化
 
 
 
-.tool-grid .tool-card h2{
 
 
-    font-size:21px;
 
 
-    margin-bottom:12px;
+/* =====================
+细节优化
+===================== */
+
+
+button{
+
+
+    font-family:inherit;
 
 
 }
@@ -806,10 +1133,51 @@ ERP尺寸优化
 
 
 
-.tool-grid .tool-card p{
+
+strong{
 
 
-    font-size:15px;
+    font-weight:700;
+
+
+}
+
+
+
+
+
+
+::-webkit-scrollbar{
+
+
+    width:8px;
+
+    height:8px;
+
+
+}
+
+
+
+
+
+::-webkit-scrollbar-thumb{
+
+
+    background:#c9cdd4;
+
+    border-radius:10px;
+
+
+}
+
+
+
+
+::-webkit-scrollbar-track{
+
+
+    background:#f5f6f8;
 
 
 }
