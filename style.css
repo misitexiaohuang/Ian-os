@@ -1,0 +1,815 @@
+*{
+    box-sizing:border-box;
+}
+
+
+body{
+
+    margin:0;
+
+    background:#f5f6f8;
+
+    color:#1f2329;
+
+    font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+    font-size:14px;
+
+}
+
+
+
+/* =====================
+整体布局
+===================== */
+
+
+.app-layout{
+
+    display:flex;
+
+    min-height:100vh;
+
+}
+
+
+
+
+
+/* =====================
+左侧导航
+===================== */
+
+
+.sidebar{
+
+    width:220px;
+
+    background:#1f2329;
+
+    color:white;
+
+    position:fixed;
+
+    left:0;
+
+    top:0;
+
+    bottom:0;
+
+    padding:25px 15px;
+
+}
+
+
+
+
+.brand h2{
+
+    margin:0;
+
+    font-size:24px;
+
+    font-weight:700;
+
+}
+
+
+
+.brand p{
+
+    margin-top:8px;
+
+    color:#86909c;
+
+    font-size:13px;
+
+}
+
+
+
+
+.menu{
+
+    margin-top:35px;
+
+}
+
+
+
+.menu-item{
+
+    display:block;
+
+    padding:11px 14px;
+
+    margin-bottom:6px;
+
+    border-radius:6px;
+
+    text-decoration:none;
+
+    color:#c9cdd4;
+
+}
+
+
+
+.menu-item:hover{
+
+    background:#30343b;
+
+    color:white;
+
+}
+
+
+
+.menu-item.active{
+
+    background:#1677ff;
+
+    color:white;
+
+}
+
+
+
+
+
+.sidebar-footer{
+
+    position:absolute;
+
+    bottom:20px;
+
+    color:#86909c;
+
+    font-size:12px;
+
+}
+
+
+
+
+
+
+
+
+/* =====================
+右侧区域
+===================== */
+
+
+.content{
+
+    margin-left:220px;
+
+    width:calc(100% - 220px);
+
+    min-height:100vh;
+
+    padding:40px;
+
+    display:flex;
+
+    justify-content:center;
+
+}
+
+
+
+
+
+.container{
+
+    width:100%;
+
+    max-width:900px;
+
+}
+
+
+
+
+
+
+
+/* =====================
+首页
+===================== */
+
+
+.dashboard-header{
+
+    background:white;
+
+    border:1px solid #e5e6eb;
+
+    border-radius:8px;
+
+    padding:25px;
+
+    margin-bottom:25px;
+
+}
+
+
+
+.dashboard-header h1{
+
+    margin:0;
+
+    font-size:26px;
+
+}
+
+
+
+.dashboard-header p{
+
+    color:#86909c;
+
+}
+
+
+
+
+
+
+
+.tool-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+    repeat(3,260px);
+
+    justify-content:center;
+
+    gap:20px;
+
+}
+
+
+
+
+
+
+/* 首页卡片 */
+
+.tool-grid .tool-card{
+
+
+    height:180px;
+
+    background:white;
+
+    border:1px solid #e5e6eb;
+
+    border-radius:8px;
+
+    padding:22px;
+
+    text-decoration:none;
+
+    color:#1f2329;
+
+    transition:.2s;
+
+
+}
+
+
+
+.tool-grid .tool-card:hover{
+
+    border-color:#1677ff;
+
+    transform:translateY(-3px);
+
+}
+
+
+
+
+
+.tool-grid .tool-icon{
+
+    font-size:28px;
+
+    margin-bottom:18px;
+
+}
+
+
+
+
+
+.tool-grid .tool-card h2{
+
+    margin:0 0 8px;
+
+    font-size:17px;
+
+}
+
+
+
+
+
+.tool-grid .tool-card p{
+
+    margin:0;
+
+    color:#86909c;
+
+    line-height:1.5;
+
+}
+
+
+
+
+
+
+
+
+
+/* =====================
+工具页面
+===================== */
+
+
+.back-btn{
+
+    display:inline-block;
+
+    margin-bottom:20px;
+
+    color:#1677ff;
+
+    text-decoration:none;
+
+}
+
+
+
+
+.hero{
+
+    margin-bottom:30px;
+
+}
+
+
+
+.hero h1{
+
+    margin:0 0 10px;
+
+    font-size:30px;
+
+}
+
+
+
+.hero p{
+
+    margin:0;
+
+    color:#86909c;
+
+}
+
+
+
+
+
+
+
+/* 工具输入卡片 */
+
+
+.container > .tool-card{
+
+
+    background:white;
+
+    border:1px solid #e5e6eb;
+
+    border-radius:8px;
+
+    padding:30px;
+
+    margin-bottom:20px;
+
+
+}
+
+
+
+
+
+.result-box{
+
+
+    background:white;
+
+    border:1px solid #e5e6eb;
+
+    border-radius:8px;
+
+    padding:30px;
+
+
+}
+
+
+
+
+
+
+
+/* =====================
+输入
+===================== */
+
+
+.input-row{
+
+    display:flex;
+
+    gap:20px;
+
+    margin-bottom:18px;
+
+}
+
+
+
+.input-row > div{
+
+    flex:1;
+
+}
+
+
+
+label{
+
+    display:block;
+
+    color:#4e5969;
+
+    margin-bottom:7px;
+
+}
+
+
+
+input{
+
+
+    width:100%;
+
+    height:42px;
+
+    border:1px solid #c9cdd4;
+
+    border-radius:6px;
+
+    padding:0 12px;
+
+
+}
+
+
+
+input:focus{
+
+    outline:none;
+
+    border-color:#1677ff;
+
+}
+
+
+
+
+
+
+
+/* =====================
+按钮
+===================== */
+
+
+.calculate-btn{
+
+
+    width:100%;
+
+    height:42px;
+
+    background:#1677ff;
+
+    color:white;
+
+    border:none;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+
+}
+
+
+.calculate-btn:hover{
+
+    background:#0e5fd8;
+
+}
+
+
+
+
+
+
+/* =====================
+表格
+===================== */
+
+
+.table-box{
+
+    overflow:auto;
+
+}
+
+
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+
+
+th,td{
+
+    padding:12px;
+
+    border-bottom:1px solid #eee;
+
+}
+
+
+
+
+
+
+
+@media(max-width:900px){
+
+
+.sidebar{
+
+    position:relative;
+
+    width:100%;
+
+}
+
+
+.app-layout{
+
+    flex-direction:column;
+
+}
+
+
+.content{
+
+    margin-left:0;
+
+    width:100%;
+
+    padding:20px;
+
+}
+
+
+.tool-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+
+.input-row{
+
+    flex-direction:column;
+
+}
+
+
+}
+
+/* =====================
+ERP尺寸优化
+===================== */
+
+
+/* 左侧导航放大 */
+
+.sidebar{
+
+    width:260px;
+
+    padding:30px 20px;
+
+}
+
+
+
+.brand h2{
+
+    font-size:28px;
+
+}
+
+
+
+.brand p{
+
+    font-size:14px;
+
+}
+
+
+
+
+.menu{
+
+    margin-top:45px;
+
+}
+
+
+
+.menu-item{
+
+    padding:14px 16px;
+
+    font-size:15px;
+
+    border-radius:8px;
+
+}
+
+
+
+
+/* 右侧区域 */
+
+.content{
+
+    margin-left:260px;
+
+    width:calc(100% - 260px);
+
+    padding:50px;
+
+}
+
+
+
+
+
+
+.container{
+
+    max-width:1100px;
+
+}
+
+
+
+
+
+
+
+/* 首页顶部 */
+
+
+.dashboard-header{
+
+    padding:35px;
+
+    border-radius:12px;
+
+    margin-bottom:35px;
+
+}
+
+
+
+.dashboard-header h1{
+
+    font-size:34px;
+
+}
+
+
+
+.dashboard-header p{
+
+    font-size:16px;
+
+}
+
+
+
+
+
+
+
+
+/* 首页卡片 */
+
+
+.tool-grid{
+
+
+    grid-template-columns:
+
+    repeat(3,300px);
+
+
+    gap:30px;
+
+
+}
+
+
+
+
+.tool-grid .tool-card{
+
+
+    height:220px;
+
+    padding:30px;
+
+    border-radius:14px;
+
+
+}
+
+
+
+.tool-grid .tool-icon{
+
+
+    font-size:38px;
+
+    margin-bottom:25px;
+
+
+}
+
+
+
+
+.tool-grid .tool-card h2{
+
+
+    font-size:21px;
+
+
+    margin-bottom:12px;
+
+
+}
+
+
+
+
+.tool-grid .tool-card p{
+
+
+    font-size:15px;
+
+
+}

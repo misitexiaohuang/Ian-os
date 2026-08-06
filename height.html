@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>身高体重换算</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+
+<!-- 左侧导航 -->
+
+<aside class="sidebar">
+
+
+    <div class="brand">
+
+        <h2>
+            Ian OS
+        </h2>
+
+        <p>
+            TikTok运营效率工具
+        </p>
+
+    </div>
+
+
+
+
+    <div class="menu">
+
+
+        <a href="index.html" class="menu-item">
+
+            🏠 首页
+
+        </a>
+
+
+
+        <a href="height.html" class="menu-item active">
+
+            📏 身高体重换算
+
+        </a>
+
+
+
+        <a href="commission.html" class="menu-item">
+
+            💰 当月TC预估
+
+        </a>
+
+
+
+        <a href="destroy.html" class="menu-item">
+
+            🗑️ 销毁费用预估
+
+        </a>
+
+
+
+    </div>
+
+
+
+
+    <div class="sidebar-footer">
+
+        Ian OS v1.0
+
+    </div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<!-- 右侧内容 -->
+
+<main class="content">
+
+
+
+<div class="container">
+
+
+
+
+
+
+
+
+<div class="hero">
+
+
+<h1>
+
+📏 身高体重换算
+
+</h1>
+
+
+<p>
+
+Feet / Inches / lbs 自动转换 cm 和 kg
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="tool-card">
+
+
+
+<h2>
+
+输入信息
+
+</h2>
+
+
+
+
+<div class="input-row">
+
+
+<div>
+
+
+<label>
+
+Height (ft)
+
+</label>
+
+
+<input 
+id="height-ft" 
+type="number" 
+placeholder="例如：5">
+
+
+</div>
+
+
+
+
+
+<div>
+
+
+<label>
+
+Height (in)
+
+</label>
+
+
+<input 
+id="height-in" 
+type="number" 
+placeholder="例如：10">
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="input-row">
+
+
+<div>
+
+
+<label>
+
+Weight (lbs)
+
+</label>
+
+
+<input 
+id="weight-lbs" 
+type="number" 
+placeholder="例如：165">
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<button 
+onclick="convertHeightWeight()" 
+class="calculate-btn">
+
+计算
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="result-box">
+
+
+<h3>
+
+计算结果
+
+</h3>
+
+
+
+<p id="result">
+
+等待计算...
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+</main>
+
+
+
+</div>
+
+
+
+
+
+<script src="height.js"></script>
+
+
+</body>
+
+
+</html>
