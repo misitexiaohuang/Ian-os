@@ -1181,3 +1181,102 @@ strong{
 
 
 }
+
+/* =====================
+TC页面紧凑优化
+===================== */
+
+
+.compact-result p{
+
+    margin:8px 0;
+
+    line-height:1.5;
+
+}
+
+
+
+.tc-final{
+
+    margin-top:15px !important;
+
+    font-size:18px;
+
+}
+
+
+
+
+
+/* TC页面卡片间距优化 */
+
+
+.container > .tool-card{
+
+    padding:24px;
+
+    margin-bottom:14px;
+
+}
+
+
+
+.result-box{
+
+    padding:24px;
+
+    margin-bottom:14px;
+
+}
+
+
+
+
+
+/* 输入区域压缩 */
+
+
+.input-row{
+
+    margin-bottom:12px;
+
+}
+
+
+
+label{
+
+    margin-bottom:5px;
+
+}
+
+
+
+input{
+
+    height:40px;
+
+}
+
+
+
+
+
+/* 表格压缩 */
+
+
+table th,
+table td{
+
+    padding:10px;
+
+}
+
+
+
+table{
+
+    font-size:15px;
+
+}

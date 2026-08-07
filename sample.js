@@ -5,7 +5,6 @@ console.log("Sample audit loaded!");
 // 数据读取
 // =====================
 
-
 let sampleData =
 JSON.parse(
 localStorage.getItem("sampleData")
@@ -44,7 +43,6 @@ document.getElementById("remark").value;
 
 
 
-
 if(!handle || !date){
 
 alert("请填写达人Handle和申请时间");
@@ -75,7 +73,6 @@ render();
 
 
 
-
 document.getElementById("handle").value="";
 
 document.getElementById("product").value="";
@@ -91,10 +88,8 @@ document.getElementById("remark").value="";
 
 
 
-
-
 // =====================
-// 计算剩余通过时间
+// 计算距离申样时间
 // =====================
 
 
@@ -132,8 +127,6 @@ return Math.floor(
 
 
 
-
-
 // =====================
 // 日期选择器
 // =====================
@@ -149,16 +142,12 @@ document
 .forEach(function(input){
 
 
-
 input.onclick=function(){
-
 
 
 if(this.showPicker){
 
-
 this.showPicker();
-
 
 }
 
@@ -166,12 +155,10 @@ this.showPicker();
 };
 
 
-
 });
 
 
 }
-
 
 
 
@@ -205,18 +192,24 @@ box.innerHTML="";
 
 
 
+// 不改变原数据排序
+
+let displayData =
+[...sampleData];
+
+
+
 
 // 排序
-
 
 if(sortType==="asc"){
 
 
-sampleData.sort(function(a,b){
+// 时间短 → 长
 
+displayData.sort(function(a,b){
 
 return getDays(a.date)-getDays(b.date);
-
 
 });
 
@@ -228,11 +221,11 @@ return getDays(a.date)-getDays(b.date);
 if(sortType==="desc"){
 
 
-sampleData.sort(function(a,b){
+// 时间长 → 短
 
+displayData.sort(function(a,b){
 
 return getDays(b.date)-getDays(a.date);
-
 
 });
 
@@ -243,9 +236,9 @@ return getDays(b.date)-getDays(a.date);
 
 
 
+displayData.forEach(
 
-sampleData.forEach(
-function(item,index){
+function(item){
 
 
 
@@ -258,26 +251,33 @@ let color="";
 
 
 
-if(days>2){
+// 新颜色规则
+
+if(days < 5){
 
 color="sample-green";
 
-
 }
-else if(days===2){
 
+else if(days <= 6){
 
 color="sample-yellow";
 
-
 }
-else if(days<=1){
 
+else{
 
 color="sample-red";
 
-
 }
+
+
+
+
+
+
+let index =
+sampleData.indexOf(item);
 
 
 
@@ -307,6 +307,7 @@ onchange="updateData(${index},'handle',this.value)"
 
 
 
+
 <td>
 
 <input
@@ -320,6 +321,8 @@ onchange="updateData(${index},'product',this.value)"
 >
 
 </td>
+
+
 
 
 
@@ -345,6 +348,8 @@ onchange="updateData(${index},'date',this.value)"
 
 
 
+
+
 <td>
 
 <span class="${color}">
@@ -354,6 +359,8 @@ ${days} 天
 </span>
 
 </td>
+
+
 
 
 
@@ -372,6 +379,8 @@ onchange="updateData(${index},'remark',this.value)"
 >
 
 </td>
+
+
 
 
 
@@ -404,13 +413,12 @@ onclick="removeSample(${index})">
 
 
 
-// 重点：动态生成后重新绑定
+// 动态生成后重新绑定日期
 
 enableDatePicker();
 
 
 }
-
 
 
 
@@ -443,8 +451,6 @@ render();
 
 
 
-
-
 // =====================
 // 删除
 // =====================
@@ -462,6 +468,7 @@ index,
 );
 
 
+
 saveData();
 
 
@@ -469,8 +476,6 @@ render();
 
 
 }
-
-
 
 
 
@@ -498,8 +503,6 @@ render();
 
 
 
-
-
 // =====================
 // 保存
 // =====================
@@ -518,8 +521,6 @@ JSON.stringify(sampleData)
 
 
 }
-
-
 
 
 
@@ -555,14 +556,13 @@ if(dateInput){
 
 dateInput.addEventListener(
 "click",
+
 function(){
 
 
 if(this.showPicker){
 
-
 this.showPicker();
-
 
 }
 
@@ -571,7 +571,6 @@ this.showPicker();
 
 
 }
-
 
 
 }
