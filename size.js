@@ -1,8 +1,9 @@
 // =====================================================
 // size.js
-// 真人尺码参考
-// 产品直接从 Supabase creators 表读取
+// 尺码助手
+// 最终独立版
 // =====================================================
+
 
 console.log("================================");
 console.log("size.js 正在加载");
@@ -13,31 +14,54 @@ console.log("================================");
 // 全局数据
 // =====================================================
 
-let creatorLibrary = [];
+window.currentBody = null;
 
-window.creatorLibrary = [];
+window.sizeAssistantCreators = [];
 
-window.creatorsReady = null;
-
-let currentProduct = "";
+window.sizeAssistantProducts = [];
 
 
 // =====================================================
-// Supabase Client
+// Supabase
 // =====================================================
 
-function getSupabaseClient() {
+async function waitForSupabase() {
 
-    if (
-        window.supabaseClient
-    ) {
+    for (let i = 0; i < 30; i++) {
 
-        return window.supabaseClient;
+        if (window.supabaseClient) {
+
+            console.log(
+                "✅ Supabase Client 已准备好"
+            );
+
+            return window.supabaseClient;
+        }
+
+
+        console.log(
+            "等待 Supabase...",
+            i + 1
+        );
+
+
+        await new Promise(function(resolve) {
+
+            setTimeout(
+                resolve,
+                300
+            );
+
+        });
 
     }
 
-    return null;
 
+    console.error(
+        "❌ Supabase Client 加载失败"
+    );
+
+    return null;
 }
 
 
@@ -53,32 +77,43 @@ function escapeHTML(value) {
     ) {
 
         return "";
-
     }
+
 
     return String(value)
 
-        .replace(/&/g, "&amp;")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-        .replace(/</g, "&lt;")
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-        .replace(/>/g, "&gt;")
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/"/g, "&quot;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/'/g, "&#039;");
-
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
 // =====================================================
-// 产品名称处理
-//
-// 这里只负责显示统一
-// 不修改 Supabase 原始数据
+// TikTok URL 标准化
 // =====================================================
 
-function cleanProductName(value) {
+function normalizeVideoURL(value) {
 
     if (
         value === null ||
@@ -86,58 +121,162 @@ function cleanProductName(value) {
     ) {
 
         return "";
-
     }
 
 
-    let product =
+    let url =
         String(value)
-            .replace(/\s+/g, " ")
             .trim();
+
+
+    if (!url) {
+
+        return "";
+    }
+
+
+    // 去掉前后引号
+
+    url =
+        url
+            .replace(/^["']+/, "")
+            .replace(/["']+$/, "")
+            .trim();
+
+
+    // 自动补 HTTPS
+
+    if (
+        !url.startsWith("http://") &&
+        !url.startsWith("https://")
+    ) {
+
+        url =
+            "https://" +
+            url;
+    }
+
+
+    return url;
+}
+
+
+// =====================================================
+// 打开达人视频
+// =====================================================
+
+function openCreatorVideo(url) {
+
+    const finalURL =
+        normalizeVideoURL(
+            url
+        );
+
+
+    if (!finalURL) {
+
+        alert(
+            "该达人暂无视频链接"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const newWindow =
+            window.open(
+                finalURL,
+                "_blank",
+                "noopener,noreferrer"
+            );
+
+
+        if (!newWindow) {
+
+            alert(
+                "浏览器阻止了新窗口，请允许当前网站打开新标签页"
+            );
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "打开视频失败:",
+            error
+        );
+
+
+        window.location.href =
+            finalURL;
+    }
+}
+
+
+// =====================================================
+// 产品名称标准化
+// =====================================================
+
+function normalizeProductName(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+    }
+
+
+    return String(value)
+
+        .replace(
+            /\s+/g,
+            " "
+        )
+
+        .trim();
+}
+
+
+// =====================================================
+// 产品匹配 Key
+// =====================================================
+
+function getProductKey(value) {
+
+    let product =
+        normalizeProductName(
+            value
+        );
 
 
     if (!product) {
 
         return "";
-
     }
 
 
     // =================================================
-    // 去掉：
-    //
-    // - Black
-    // - White
-    // - Grey
-    // - Gray
-    // - Navy
-    // - Blue
-    // - Red
-    // - Green
-    // - Brown
-    // - Beige
-    // - Cream
-    // - Khaki
-    // - Tan
-    // - Burgundy
-    // - Wine
-    // - Off White
-    // - Charcoal
-    // - Olive
+    // 颜色
     // =================================================
 
     const colors =
         "black|white|grey|gray|navy|blue|red|green|brown|beige|cream|khaki|tan|burgundy|wine|off\\s*white|charcoal|olive";
 
 
+    // =================================================
+    // 尺码
+    // =================================================
+
     const sizes =
         "XXXL|XXL|3XL|2XL|XL|XS|S|M|L";
 
 
     // =================================================
-    // 颜色 + 尺码
-    //
-    // Baggy Pleated Shorts - Black - M
+    // 产品 - Black - M
     // =================================================
 
     product =
@@ -153,14 +292,11 @@ function cleanProductName(value) {
             ),
 
             ""
-
         );
 
 
     // =================================================
-    // 尺码
-    //
-    // Baggy Pleated Shorts - M
+    // 产品 - M
     // =================================================
 
     product =
@@ -174,14 +310,11 @@ function cleanProductName(value) {
             ),
 
             ""
-
         );
 
 
     // =================================================
-    // 颜色
-    //
-    // Baggy Pleated Shorts - Black
+    // 产品 - Black
     // =================================================
 
     product =
@@ -195,411 +328,78 @@ function cleanProductName(value) {
             ),
 
             ""
-
         );
 
 
     // =================================================
-    // 括号
-    //
-    // Baggy Pleated Shorts (Black)
-    // Baggy Pleated Shorts (Black, M)
+    // 产品 (Black)
+    // 产品 (Black, M)
     // =================================================
 
     product =
         product.replace(
-
             /\s*\([^)]*\)\s*$/,
-
             ""
-
         );
 
 
     // =================================================
-    // 清理末尾符号
+    // 清理
     // =================================================
 
     product =
         product
-
             .replace(
                 /\s*[-_/|]\s*$/,
                 ""
             )
-
             .replace(
                 /\s{2,}/g,
                 " "
             )
-
-            .trim();
+            .trim()
+            .toLowerCase();
 
 
     return product;
-
 }
 
 
 // =====================================================
-// 等待 Supabase
+// 显示产品错误
 // =====================================================
 
-async function waitForSupabase() {
-
-    for (
-        let i = 0;
-        i < 20;
-        i++
-    ) {
-
-        const client =
-            getSupabaseClient();
-
-
-        if (client) {
-
-            console.log(
-                "✅ Supabase Client 已准备好"
-            );
-
-            return client;
-
-        }
-
-
-        console.log(
-            "等待 Supabase:",
-            i + 1
-        );
-
-
-        await new Promise(
-            resolve =>
-                setTimeout(
-                    resolve,
-                    500
-                )
-        );
-
-    }
-
-
-    console.error(
-        "❌ Supabase Client 加载失败"
-    );
-
-
-    return null;
-
-}
-
-
-// =====================================================
-// 第一步
-// 直接从 creators 表读取所有产品
-// =====================================================
-
-async function loadProducts() {
-
-    console.log("================================");
-    console.log("📦 开始读取 Supabase 产品");
-    console.log("================================");
-
-
-    const client =
-        await waitForSupabase();
-
-
-    if (!client) {
-
-        showNoProducts(
-            "Supabase 连接失败"
-        );
-
-        return [];
-
-    }
-
-
-    // =================================================
-    // 直接读取 product
-    // =================================================
-
-    const {
-        data,
-        error
-    } = await client
-
-        .from("creators")
-
-        .select("product");
-
-
-    // =================================================
-    // 查询失败
-    // =================================================
-
-    if (error) {
-
-        console.error(
-            "❌ 产品读取失败:",
-            error
-        );
-
-
-        showNoProducts(
-            "产品读取失败"
-        );
-
-
-        return [];
-
-    }
-
-
-    console.log(
-        "📦 Supabase 原始产品数据:",
-        data
-    );
-
-
-    // =================================================
-    // 提取产品
-    // =================================================
-
-    const products = [];
-
-
-    data.forEach(
-        item => {
-
-            const product =
-                cleanProductName(
-                    item.product
-                );
-
-
-            if (
-                product &&
-                !products.includes(
-                    product
-                )
-            ) {
-
-                products.push(
-                    product
-                );
-
-            }
-
-        }
-    );
-
-
-    console.log(
-        "================================"
-    );
-
-    console.log(
-        "✅ 最终产品列表:",
-        products
-    );
-
-    console.log(
-        "产品数量:",
-        products.length
-    );
-
-    console.log(
-        "================================"
-    );
-
-
-    // =================================================
-    // 生成产品下拉框
-    // =================================================
-
-    renderProductSelect(
-        products
-    );
-
-
-    return products;
-
-}
-
-
-// =====================================================
-// 产品下拉框
-// =====================================================
-
-function renderProductSelect(products) {
+function showProductError(message) {
 
     const select =
         document.getElementById(
-            "size-product"
+            "productSelect"
         );
 
 
     if (!select) {
 
-        console.error(
-            "❌ 找不到 #size-product"
-        );
-
         return;
-
     }
 
 
-    // =================================================
-    // 清空
-    // =================================================
+    select.innerHTML = `
 
-    select.innerHTML = "";
+        <option value="">
 
+            ${escapeHTML(message)}
 
-    // =================================================
-    // 没有产品
-    // =================================================
+        </option>
 
-    if (
-        !products ||
-        products.length === 0
-    ) {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-
-        option.value = "";
-
-
-        option.textContent =
-            "暂无产品数据";
-
-
-        select.appendChild(
-            option
-        );
-
-
-        currentProduct = "";
-
-
-        return;
-
-    }
-
-
-    // =================================================
-    // 默认选项
-    // =================================================
-
-    const defaultOption =
-        document.createElement(
-            "option"
-        );
-
-
-    defaultOption.value = "";
-
-
-    defaultOption.textContent =
-        "请选择产品";
-
-
-    select.appendChild(
-        defaultOption
-    );
-
-
-    // =================================================
-    // 产品
-    // =================================================
-
-    products.forEach(
-        product => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                product;
-
-
-            option.textContent =
-                product;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    // =================================================
-    // 产品变化
-    // =================================================
-
-    select.onchange =
-        function() {
-
-            currentProduct =
-                cleanProductName(
-                    this.value
-                );
-
-
-            console.log(
-                "================================"
-            );
-
-            console.log(
-                "👕 当前选择产品:",
-                currentProduct
-            );
-
-            console.log(
-                "================================"
-            );
-
-
-            renderCreators();
-
-
-            const result =
-                document.getElementById(
-                    "result"
-                );
-
-
-            if (result) {
-
-                result.innerHTML =
-                    "请输入身高体重后查询";
-
-            }
-
-        };
-
+    `;
 }
 
 
 // =====================================================
-// 第二步
-// 从 Supabase 读取完整达人数据
+// 读取达人数据
 // =====================================================
 
-async function loadCreators() {
+async function loadCreatorsForSizeAssistant() {
 
     console.log("================================");
     console.log("👤 开始读取达人数据");
@@ -612,48 +412,42 @@ async function loadCreators() {
 
     if (!client) {
 
-        creatorLibrary = [];
-
-        window.creatorLibrary = [];
-
-        renderCreators();
+        showProductError(
+            "Supabase 连接失败"
+        );
 
         return [];
-
     }
 
 
     const {
         data,
         error
-    } = await client
-
-        .from("creators")
-
-        .select("*");
+    } =
+        await client
+            .from("creators")
+            .select("*");
 
 
     if (error) {
 
         console.error(
-            "❌ 达人数据读取失败:",
+            "❌ creators 数据读取失败:",
             error
         );
 
 
-        creatorLibrary = [];
+        showProductError(
+            "达人数据读取失败"
+        );
 
-        window.creatorLibrary = [];
-
-        renderCreators();
 
         return [];
-
     }
 
 
     console.log(
-        "✅ Supabase 达人原始数据:",
+        "✅ creators 原始数据:",
         data
     );
 
@@ -663,24 +457,29 @@ async function loadCreators() {
         data.length === 0
     ) {
 
-        creatorLibrary = [];
+        window.sizeAssistantCreators = [];
 
-        window.creatorLibrary = [];
+        window.sizeAssistantProducts = [];
 
-        renderCreators();
+
+        showProductError(
+            "达人尺码管理中暂无产品"
+        );
+
 
         return [];
-
     }
 
 
     // =================================================
-    // 转换
+    // 保存达人数据
     // =================================================
 
-    creatorLibrary =
-        data.map(
-            item => {
+    window.sizeAssistantCreators =
+
+        data
+
+            .map(function(item) {
 
                 return {
 
@@ -694,15 +493,14 @@ async function loadCreators() {
                         .trim(),
 
                     product:
-                        cleanProductName(
+                        normalizeProductName(
                             item.product
                         ),
 
-                    rawProduct:
-                        String(
-                            item.product ?? ""
-                        )
-                        .trim(),
+                    productKey:
+                        getProductKey(
+                            item.product
+                        ),
 
                     height:
                         Number(
@@ -727,19 +525,21 @@ async function loadCreators() {
                         .trim(),
 
                     video:
-                        String(
-                            item.video_url ?? ""
+                        normalizeVideoURL(
+                            item.video_url
                         )
-                        .trim()
 
                 };
 
-            }
-        );
+            })
 
+            .filter(function(item) {
 
-    window.creatorLibrary =
-        creatorLibrary;
+                return (
+                    item.productKey !== ""
+                );
+
+            });
 
 
     console.log(
@@ -747,12 +547,8 @@ async function loadCreators() {
     );
 
     console.log(
-        "✅ 达人数据加载完成"
-    );
-
-    console.log(
-        "达人数量:",
-        creatorLibrary.length
+        "✅ 尺码助手达人数量:",
+        window.sizeAssistantCreators.length
     );
 
     console.log(
@@ -761,523 +557,926 @@ async function loadCreators() {
 
 
     // =================================================
-    // 如果已经选择产品
-    // 更新达人
+    // 生成产品列表
     // =================================================
 
-    renderCreators();
+    const productMap =
+        new Map();
 
 
-    return creatorLibrary;
+    window.sizeAssistantCreators.forEach(
+        function(item) {
 
-}
-
-
-// =====================================================
-// 获取当前产品达人
-// =====================================================
-
-function getCurrentProductCreators() {
-
-    const select =
-        document.getElementById(
-            "size-product"
-        );
+            const key =
+                item.productKey;
 
 
-    if (select) {
+            if (
+                !productMap.has(key)
+            ) {
 
-        currentProduct =
-            cleanProductName(
-                select.value
-            );
-
-    }
-
-
-    if (!currentProduct) {
-
-        return [];
-
-    }
-
-
-    return creatorLibrary.filter(
-        item => {
-
-            return (
-                cleanProductName(
+                productMap.set(
+                    key,
                     item.product
-                )
-                ===
-                currentProduct
-            );
+                );
+            }
 
         }
     );
 
-}
 
-
-// =====================================================
-// 显示达人
-// =====================================================
-
-function renderCreators() {
-
-    const box =
-        document.getElementById(
-            "creatorList"
+    window.sizeAssistantProducts =
+        Array.from(
+            productMap.values()
         );
 
 
-    if (!box) {
-
-        return;
-
-    }
-
-
-    box.innerHTML = "";
-
-
-    const creators =
-        getCurrentProductCreators();
-
-
     console.log(
-        "👕 当前产品达人:",
-        creators
+        "📦 尺码助手产品列表:",
+        window.sizeAssistantProducts
     );
 
 
-    // =================================================
-    // 没有选择产品
-    // =================================================
+    renderProductSelect();
 
-    if (!currentProduct) {
 
-        box.innerHTML = `
-
-            <div class="creator-empty">
-
-                👕 请先选择产品
-
-                <br>
-
-                <span>
-                    选择产品后即可查看相同产品的达人参考
-                </span>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    // =================================================
-    // 没有达人
-    // =================================================
-
-    if (
-        creators.length === 0
-    ) {
-
-        box.innerHTML = `
-
-            <div class="creator-empty">
-
-                👕 暂时还没有该产品的达人数据
-
-                <br>
-
-                <span>
-                    当前产品：
-                    ${escapeHTML(
-                        currentProduct
-                    )}
-                </span>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    // =================================================
-    // 达人卡片
-    // =================================================
-
-    creators.forEach(
-        item => {
-
-            let videoButton = "";
-
-
-            if (item.video) {
-
-                videoButton = `
-
-                    <button
-
-                        type="button"
-
-                        class="video-btn"
-
-                        onclick="openVideo(${JSON.stringify(
-                            item.video
-                        )})"
-
-                    >
-
-                        🎬 查看达人视频
-
-                    </button>
-
-                `;
-
-            }
-
-            else {
-
-                videoButton = `
-
-                    <button
-
-                        type="button"
-
-                        class="
-                            video-btn
-                            video-disabled
-                        "
-
-                        disabled
-
-                    >
-
-                        暂无达人视频
-
-                    </button>
-
-                `;
-
-            }
-
-
-            box.innerHTML += `
-
-                <div class="creator-card">
-
-
-                    <div class="creator-top">
-
-
-                        <div class="creator-avatar">
-
-                            👕
-
-
-                        </div>
-
-
-                        <div class="creator-title">
-
-
-                            <h3>
-
-                                ${escapeHTML(
-                                    item.name ||
-                                    "未命名达人"
-                                )}
-
-                            </h3>
-
-
-                            <div class="creator-product">
-
-                                ${escapeHTML(
-                                    item.product ||
-                                    "暂无产品"
-                                )}
-
-                            </div>
-
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <div class="creator-body">
-
-
-                        <div class="creator-stat">
-
-
-                            <span class="stat-label">
-
-                                身高
-
-                            </span>
-
-
-                            <strong>
-
-                                ${
-                                    item.height ||
-                                    "--"
-                                }
-
-                                cm
-
-                            </strong>
-
-
-                        </div>
-
-
-
-                        <div class="creator-stat">
-
-
-                            <span class="stat-label">
-
-                                体重
-
-                            </span>
-
-
-                            <strong>
-
-                                ${
-                                    item.weight ||
-                                    "--"
-                                }
-
-                                kg
-
-                            </strong>
-
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <div class="creator-size">
-
-
-                        <span>
-
-                            推荐尺码
-
-                        </span>
-
-
-                        <strong>
-
-                            ${escapeHTML(
-                                item.size ||
-                                "--"
-                            )}
-
-                        </strong>
-
-
-                    </div>
-
-
-
-                    <div class="creator-fit">
-
-
-                        <span class="fit-label">
-
-                            穿着效果
-
-                        </span>
-
-
-                        <span class="fit-text">
-
-                            ${escapeHTML(
-                                item.fit ||
-                                "暂无描述"
-                            )}
-
-                        </span>
-
-
-                    </div>
-
-
-
-                    ${videoButton}
-
-
-                </div>
-
-            `;
-
-        }
-    );
-
+    return window.sizeAssistantCreators;
 }
 
 
 // =====================================================
-// 没有产品
+// 生成产品下拉框
 // =====================================================
 
-function showNoProducts(message) {
+function renderProductSelect() {
 
     const select =
         document.getElementById(
-            "size-product"
+            "productSelect"
         );
 
 
     if (!select) {
 
-        return;
+        console.error(
+            "❌ 找不到 #productSelect"
+        );
 
+        return;
     }
+
+
+    const products =
+        window.sizeAssistantProducts;
 
 
     select.innerHTML = "";
 
 
-    const option =
+    if (
+        !products ||
+        products.length === 0
+    ) {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value = "";
+
+
+        option.textContent =
+            "达人尺码管理中暂无产品";
+
+
+        select.appendChild(
+            option
+        );
+
+
+        return;
+    }
+
+
+    const defaultOption =
         document.createElement(
             "option"
         );
 
 
-    option.value = "";
+    defaultOption.value = "";
 
 
-    option.textContent =
-        message;
+    defaultOption.textContent =
+        "请选择产品";
 
 
     select.appendChild(
-        option
+        defaultOption
     );
 
+
+    products.forEach(
+        function(product) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                product;
+
+
+            option.textContent =
+                product;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    console.log(
+        "✅ 产品下拉框生成完成"
+    );
 }
 
 
 // =====================================================
-// 打开达人视频
+// 产品选择变化
 // =====================================================
 
-function openVideo(url) {
+function handleProductChange() {
 
-    if (!url) {
-
-        alert(
-            "暂无视频链接"
+    const select =
+        document.getElementById(
+            "productSelect"
         );
 
-        return;
 
+    const result =
+        document.getElementById(
+            "creatorResult"
+        );
+
+
+    if (
+        !select ||
+        !result
+    ) {
+
+        return;
     }
 
 
-    window.open(
-        url,
-        "_blank"
+    const product =
+        normalizeProductName(
+            select.value
+        );
+
+
+    if (!product) {
+
+        result.innerHTML = `
+
+            <p>
+                请选择产品后查看参考达人
+            </p>
+
+        `;
+
+        return;
+    }
+
+
+    result.innerHTML = `
+
+        <p>
+
+            已选择：
+
+            <strong>
+                ${escapeHTML(product)}
+            </strong>
+
+            <br>
+
+            点击「查看参考达人」进行匹配
+
+        </p>
+
+    `;
+}
+
+
+// =====================================================
+// 身高体重换算
+// =====================================================
+
+function convertHeightWeight() {
+
+    const ftInput =
+        document.getElementById(
+            "height-ft"
+        );
+
+
+    const inchInput =
+        document.getElementById(
+            "height-in"
+        );
+
+
+    const lbsInput =
+        document.getElementById(
+            "weight-lbs"
+        );
+
+
+    const result =
+        document.getElementById(
+            "result"
+        );
+
+
+    if (
+        !ftInput ||
+        !inchInput ||
+        !lbsInput ||
+        !result
+    ) {
+
+        return;
+    }
+
+
+    const ft =
+        Number(
+            ftInput.value
+        ) || 0;
+
+
+    const inch =
+        Number(
+            inchInput.value
+        ) || 0;
+
+
+    const lbs =
+        Number(
+            lbsInput.value
+        ) || 0;
+
+
+    if (
+        ft <= 0 &&
+        inch <= 0
+    ) {
+
+        alert(
+            "请输入身高"
+        );
+
+        return;
+    }
+
+
+    if (
+        lbs <= 0
+    ) {
+
+        alert(
+            "请输入体重"
+        );
+
+        return;
+    }
+
+
+    const cm =
+        ft * 30.48 +
+        inch * 2.54;
+
+
+    const kg =
+        lbs * 0.453592;
+
+
+    const finalCm =
+        Number(
+            cm.toFixed(1)
+        );
+
+
+    const finalKg =
+        Number(
+            kg.toFixed(1)
+        );
+
+
+    window.currentBody = {
+
+        height:
+            finalCm,
+
+        weight:
+            finalKg
+
+    };
+
+
+    result.innerHTML = `
+
+        <div class="height-result">
+
+            <div class="height-result-item">
+
+                <span>
+                    身高
+                </span>
+
+                <strong>
+                    ${finalCm} cm
+                </strong>
+
+            </div>
+
+
+            <div class="height-result-item">
+
+                <span>
+                    体重
+                </span>
+
+                <strong>
+                    ${finalKg} kg
+                </strong>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    console.log(
+        "✅ 身高体重计算完成:",
+        window.currentBody
+    );
+}
+
+
+// =====================================================
+// 查找最接近达人
+// =====================================================
+
+function findCreatorSize() {
+
+    console.log("================================");
+    console.log("开始匹配达人");
+    console.log("================================");
+
+
+    if (
+        !window.currentBody
+    ) {
+
+        alert(
+            "请先计算身高体重"
+        );
+
+        return;
+    }
+
+
+    const productSelect =
+        document.getElementById(
+            "productSelect"
+        );
+
+
+    const result =
+        document.getElementById(
+            "creatorResult"
+        );
+
+
+    if (
+        !productSelect ||
+        !result
+    ) {
+
+        return;
+    }
+
+
+    const product =
+        normalizeProductName(
+            productSelect.value
+        );
+
+
+    if (!product) {
+
+        alert(
+            "请先选择产品"
+        );
+
+        return;
+    }
+
+
+    const productKey =
+        getProductKey(
+            product
+        );
+
+
+    console.log(
+        "当前产品:",
+        product
     );
 
+
+    console.log(
+        "当前产品 Key:",
+        productKey
+    );
+
+
+    const creators =
+
+        window.sizeAssistantCreators.filter(
+            function(item) {
+
+                return (
+                    item.productKey ===
+                    productKey
+                );
+
+            }
+        );
+
+
+    console.log(
+        "当前产品达人:",
+        creators
+    );
+
+
+    if (
+        creators.length === 0
+    ) {
+
+        result.innerHTML = `
+
+            <div class="size-result-empty">
+
+                暂无
+                <strong>
+                    ${escapeHTML(product)}
+                </strong>
+                的达人数据
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    const targetHeight =
+        Number(
+            window.currentBody.height
+        ) || 0;
+
+
+    const targetWeight =
+        Number(
+            window.currentBody.weight
+        ) || 0;
+
+
+    const sortedCreators =
+
+        creators
+
+            .map(function(item) {
+
+                const creatorHeight =
+                    Number(
+                        item.height
+                    ) || 0;
+
+
+                const creatorWeight =
+                    Number(
+                        item.weight
+                    ) || 0;
+
+
+                const heightDiff =
+                    Math.abs(
+                        creatorHeight -
+                        targetHeight
+                    );
+
+
+                const weightDiff =
+                    Math.abs(
+                        creatorWeight -
+                        targetWeight
+                    );
+
+
+                const distance =
+                    heightDiff +
+                    weightDiff * 0.5;
+
+
+                return {
+
+                    ...item,
+
+                    distance:
+                        distance
+
+                };
+
+            })
+
+            .sort(function(a, b) {
+
+                return (
+                    a.distance -
+                    b.distance
+                );
+
+            });
+
+
+    const bestCreators =
+        sortedCreators.slice(
+            0,
+            4
+        );
+
+
+    // =================================================
+    // 渲染结果
+    // =================================================
+
+    result.innerHTML = `
+
+        <div class="matched-creator-title">
+
+            最接近你的达人
+
+        </div>
+
+
+        <div class="matched-creator-list">
+
+            ${
+
+                bestCreators
+
+                    .map(function(item, index) {
+
+                        let videoButton = "";
+
+
+                        if (
+                            item.video
+                        ) {
+
+                            videoButton = `
+
+                                <a
+
+                                    class="video-btn"
+
+                                    href="${escapeHTML(
+                                        item.video
+                                    )}"
+
+                                    target="_blank"
+
+                                    rel="noopener noreferrer"
+
+                                >
+
+                                    🎬 查看达人视频
+
+                                </a>
+
+                            `;
+
+                        } else {
+
+                            videoButton = `
+
+                                <button
+
+                                    class="video-btn video-disabled"
+
+                                    type="button"
+
+                                    disabled
+
+                                >
+
+                                    暂无达人视频
+
+                                </button>
+
+                            `;
+
+                        }
+
+
+                        return `
+
+                            <div
+                                class="matched-creator-card"
+                            >
+
+
+                                <div
+                                    class="matched-creator-avatar"
+                                >
+
+                                    👕
+
+
+                                </div>
+
+
+
+                                <div
+                                    class="matched-creator-info"
+                                >
+
+
+                                    <div
+                                        class="size-creator-name-row"
+                                    >
+
+                                        <h3>
+
+                                            ${escapeHTML(
+                                                item.name ||
+                                                "未命名达人"
+                                            )}
+
+                                        </h3>
+
+
+                                    </div>
+
+
+
+                                    <div
+                                        class="matched-product"
+                                    >
+
+                                        ${escapeHTML(
+                                            item.product ||
+                                            "暂无产品"
+                                        )}
+
+                                    </div>
+
+
+
+                                    <div
+                                        class="matched-body"
+                                    >
+
+                                        <span>
+
+                                            ${
+                                                item.height ||
+                                                "--"
+                                            }
+
+                                            cm
+
+                                        </span>
+
+
+                                        <span>
+
+                                            ${
+                                                item.weight ||
+                                                "--"
+                                            }
+
+                                            kg
+
+                                        </span>
+
+                                    </div>
+
+
+
+                                    <div
+                                        class="matched-size"
+                                    >
+
+                                        <span>
+                                            推荐尺码：
+                                        </span>
+
+
+                                        <strong>
+
+                                            ${escapeHTML(
+                                                item.size ||
+                                                "--"
+                                            )}
+
+                                        </strong>
+
+                                    </div>
+
+
+
+                                    ${
+                                        item.fit
+
+                                        ?
+
+                                        `
+
+                                            <div
+                                                class="matched-fit"
+                                            >
+
+                                                ${escapeHTML(
+                                                    item.fit
+                                                )}
+
+                                            </div>
+
+                                        `
+
+                                        :
+
+                                        ""
+
+                                    }
+
+
+
+                                    ${videoButton}
+
+
+                                </div>
+
+
+                            </div>
+
+                        `;
+
+                    })
+
+                    .join("")
+
+            }
+
+        </div>
+
+    `;
+
+
+    console.log(
+        "✅ 达人匹配完成:",
+        bestCreators
+    );
 }
+
+
+// =====================================================
+// DOM Ready
+// =====================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function() {
+
+        console.log("================================");
+        console.log("📄 尺码助手 DOM 加载完成");
+        console.log("================================");
+
+
+        // =================================================
+        // 计算按钮
+        // =================================================
+
+        const convertBtn =
+            document.getElementById(
+                "convertBtn"
+            );
+
+
+        if (convertBtn) {
+
+            convertBtn.addEventListener(
+                "click",
+                convertHeightWeight
+            );
+
+        }
+
+
+        // =================================================
+        // 产品选择
+        // =================================================
+
+        const productSelect =
+            document.getElementById(
+                "productSelect"
+            );
+
+
+        if (productSelect) {
+
+            productSelect.addEventListener(
+                "change",
+                handleProductChange
+            );
+
+        }
+
+
+        // =================================================
+        // 达人匹配按钮
+        // =================================================
+
+        const creatorMatchBtn =
+            document.getElementById(
+                "creatorMatchBtn"
+            );
+
+
+        if (creatorMatchBtn) {
+
+            creatorMatchBtn.addEventListener(
+                "click",
+                findCreatorSize
+            );
+
+        }
+
+
+        // =================================================
+        // 加载达人
+        // =================================================
+
+        await loadCreatorsForSizeAssistant();
+
+
+        console.log("================================");
+        console.log("✅ 尺码助手初始化完成");
+        console.log("================================");
+
+    }
+);
 
 
 // =====================================================
 // 暴露全局
 // =====================================================
 
-window.loadCreators =
-    loadCreators;
+window.convertHeightWeight =
+    convertHeightWeight;
 
-window.loadProducts =
-    loadProducts;
+window.findCreatorSize =
+    findCreatorSize;
 
-window.renderProductSelect =
-    renderProductSelect;
+window.loadCreatorsForSizeAssistant =
+    loadCreatorsForSizeAssistant;
 
-window.renderCreators =
-    renderCreators;
+window.normalizeProductName =
+    normalizeProductName;
 
-window.getCurrentProductCreators =
-    getCurrentProductCreators;
+window.getProductKey =
+    getProductKey;
 
-window.openVideo =
-    openVideo;
+window.openCreatorVideo =
+    openCreatorVideo;
 
-window.cleanProductName =
-    cleanProductName;
-
-
-// =====================================================
-// 页面初始化
-// =====================================================
-
-async function initSizePage() {
-
-    console.log("================================");
-    console.log("🚀 真人尺码参考开始初始化");
-    console.log("================================");
-
-
-    // =================================================
-    // 先加载产品
-    // =================================================
-
-    await loadProducts();
-
-
-    // =================================================
-    // 再加载达人
-    // =================================================
-
-    await loadCreators();
-
-
-    console.log("================================");
-    console.log("✅ 真人尺码参考初始化完成");
-    console.log("================================");
-
-}
-
-
-// =====================================================
-// DOM 加载完成
-// =====================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-
-        console.log(
-            "📄 真人尺码参考页面加载完成"
-        );
-
-
-        window.creatorsReady =
-            initSizePage();
-
-    }
-);
+window.normalizeVideoURL =
+    normalizeVideoURL;
 
 
 console.log(
