@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>达人管理</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- =========================
+    左侧导航
+    ========================= -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <h2>
+                Ian OS
+            </h2>
+
+            <p>
+                TikTok运营效率工具
+            </p>
+
+        </div>
+
+
+        <div
+            class="menu"
+            id="menu"
+        ></div>
+
+
+        <div class="sidebar-footer">
+
+            Ian OS v1.0
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =========================
+    右侧内容
+    ========================= -->
+
+    <main class="content">
+
+
+        <div class="container">
+
+
+            <!-- =========================
+            页面标题
+            ========================= -->
+
+            <div class="hero">
+
+                <h1>
+                    👕 达人管理
+                </h1>
+
+                <p>
+                    添加、编辑达人穿搭参考数据
+                </p>
+
+            </div>
+
+
+
+            <!-- =========================
+            添加达人
+            ========================= -->
+
+            <div class="tool-card">
+
+
+                <!-- =====================
+                标题 + 批量导入
+                ====================== -->
+
+                <div
+                    class="list-header"
+                    style="
+                        margin-bottom:20px;
+                    "
+                >
+
+                    <div>
+
+                        <h2
+                            style="
+                                margin:0 0 6px;
+                            "
+                        >
+
+                            添加达人
+
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onclick="location.href='creator-import.html'"
+                        style="
+                            border:1px solid #1677ff;
+                            background:#ffffff;
+                            color:#1677ff;
+                            padding:9px 15px;
+                            border-radius:8px;
+                            cursor:pointer;
+                            font-size:14px;
+                            font-family:inherit;
+                            white-space:nowrap;
+                        "
+                    >
+
+                        📥 批量导入达人
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- =====================
+                达人名称 + 产品
+                ====================== -->
+
+                <div class="input-row">
+
+
+                    <div>
+
+                        <label>
+                            达人名称
+                        </label>
+
+                        <input
+                            id="creator-name"
+                            placeholder="例如 Alex"
+                        >
+
+                    </div>
+
+
+
+                    <div>
+
+                        <label>
+                            产品
+                        </label>
+
+                        <input
+                            id="creator-product"
+                            type="text"
+                            placeholder="请输入产品名称，例如 Acid Vintage Shorts"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =====================
+                身高
+                ====================== -->
+
+                <div class="input-row">
+
+
+                    <div>
+
+                        <label>
+                            Height Feet
+                        </label>
+
+                        <input
+                            id="height-ft"
+                            type="number"
+                            placeholder="例如 5"
+                        >
+
+                    </div>
+
+
+
+                    <div>
+
+                        <label>
+                            Height Inch
+                        </label>
+
+                        <input
+                            id="height-in"
+                            type="number"
+                            placeholder="例如 10"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =====================
+                体重 + 尺码
+                ====================== -->
+
+                <div class="input-row">
+
+
+                    <div>
+
+                        <label>
+                            Weight lbs
+                        </label>
+
+                        <input
+                            id="weight-lbs"
+                            type="number"
+                            placeholder="例如 165"
+                        >
+
+                    </div>
+
+
+
+                    <div>
+
+                        <label>
+                            推荐尺码
+                        </label>
+
+                        <input
+                            id="creator-size"
+                            placeholder="例如 M"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =====================
+                穿着效果
+                ====================== -->
+
+                <div>
+
+                    <label>
+                        穿着效果
+                    </label>
+
+                    <input
+                        id="creator-fit"
+                        placeholder="例如 Relaxed Fit"
+                    >
+
+                </div>
+
+
+
+                <br>
+
+
+
+                <!-- =====================
+                视频链接
+                ====================== -->
+
+                <div>
+
+                    <label>
+                        TikTok视频链接
+                    </label>
+
+                    <input
+                        id="creator-video"
+                        placeholder="粘贴达人视频链接"
+                    >
+
+                </div>
+
+
+
+                <br>
+
+
+
+                <!-- =====================
+                保存
+                ====================== -->
+
+                <button
+                    onclick="addCreator()"
+                    class="calculate-btn"
+                >
+
+                    保存达人
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =========================
+            操作结果
+            ========================= -->
+
+            <div class="result-box">
+
+
+                <h3>
+                    操作结果
+                </h3>
+
+
+                <p id="admin-result">
+
+                    等待操作...
+
+                </p>
+
+
+            </div>
+
+
+
+            <!-- =========================
+            已保存达人
+            ========================= -->
+
+            <div class="tool-card">
+
+
+                <!-- =====================
+                列表标题
+                ====================== -->
+
+                <div
+                    class="list-header"
+                    style="
+                        margin-bottom:18px;
+                    "
+                >
+
+                    <div>
+
+                        <h2>
+                            已保存达人
+                        </h2>
+
+                        <p>
+                            已添加的达人会自动从 Supabase 加载
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =====================
+                Handle筛选
+                ====================== -->
+
+                <div
+                    style="
+                        display:flex;
+                        gap:10px;
+                        align-items:center;
+                        flex-wrap:wrap;
+                        margin-bottom:18px;
+                    "
+                >
+
+                    <input
+                        id="creatorHandleFilter"
+                        type="text"
+                        placeholder="输入达人Handle筛选，例如 @alex"
+                        style="
+                            flex:1;
+                            min-width:240px;
+                            max-width:420px;
+                            height:40px;
+                            padding:0 13px;
+                            border:1px solid #d9d9d9;
+                            border-radius:8px;
+                            font-size:14px;
+                            box-sizing:border-box;
+                        "
+                    >
+
+
+                    <button
+                        type="button"
+                        id="creatorSearchBtn"
+                        style="
+                            height:40px;
+                            padding:0 18px;
+                            border:none;
+                            border-radius:8px;
+                            background:#1677ff;
+                            color:#ffffff;
+                            cursor:pointer;
+                            font-size:14px;
+                        "
+                    >
+
+                        🔍 筛选
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="creatorClearFilterBtn"
+                        style="
+                            height:40px;
+                            padding:0 18px;
+                            border:1px solid #d9d9d9;
+                            border-radius:8px;
+                            background:#ffffff;
+                            color:#4e5969;
+                            cursor:pointer;
+                            font-size:14px;
+                        "
+                    >
+
+                        清空筛选
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- =====================
+                批量操作
+                ====================== -->
+
+                <div
+                    style="
+                        display:flex;
+                        align-items:center;
+                        justify-content:space-between;
+                        gap:12px;
+                        flex-wrap:wrap;
+                        padding:12px 14px;
+                        margin-bottom:14px;
+                        background:#f7f8fa;
+                        border-radius:8px;
+                    "
+                >
+
+                    <label
+                        style="
+                            display:flex;
+                            align-items:center;
+                            gap:8px;
+                            cursor:pointer;
+                            font-size:14px;
+                            color:#1d2129;
+                        "
+                    >
+
+                        <input
+                            type="checkbox"
+                            id="selectAllCreators"
+                            style="
+                                width:16px;
+                                height:16px;
+                                cursor:pointer;
+                            "
+                        >
+
+                        <span>
+                            全选
+                        </span>
+
+                        <span
+                            id="selectedCreatorCount"
+                            style="
+                                color:#86909c;
+                            "
+                        >
+                            已选择 0 个
+                        </span>
+
+                    </label>
+
+
+                    <button
+                        type="button"
+                        id="batchDeleteCreatorsBtn"
+                        disabled
+                        style="
+                            height:38px;
+                            padding:0 16px;
+                            border:none;
+                            border-radius:8px;
+                            background:#f53f3f;
+                            color:#ffffff;
+                            cursor:not-allowed;
+                            font-size:14px;
+                            opacity:0.55;
+                        "
+                    >
+
+                        🗑️ 批量删除
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- =====================
+                达人列表
+                ====================== -->
+
+                <div
+                    id="adminCreatorList"
+                    class="admin-creator-list"
+                >
+
+                    <div
+                        style="
+                            padding:40px;
+                            text-align:center;
+                            color:#86909c;
+                        "
+                    >
+
+                        正在加载达人...
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================
+Supabase
+========================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+
+<!-- =========================
+Supabase连接
+========================= -->
+
+<script
+    src="supabase.js?v=3"
+></script>
+
+
+<!-- =========================
+达人后台
+========================= -->
+
+<script
+    src="creator-admin.js?v=6"
+></script>
+
+
+<!-- =========================
+导航
+========================= -->
+
+<script
+    src="nav.js?v=3"
+></script>
+
+
+</body>
+
+</html>

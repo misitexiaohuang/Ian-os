@@ -1,1282 +1,2141 @@
-*{
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
 
-body{
+/* =====================
+   基础
+===================== */
 
-    margin:0;
+body {
 
-    background:#f5f6f8;
+    margin: 0;
 
-    color:#1f2329;
+    background: #f5f6f8;
+
+    color: #1f2329;
 
     font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Arial,
-    sans-serif;
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
 
-    font-size:15px;
-
+    font-size: 15px;
 }
 
 
 /* =====================
-整体布局
+   整体布局
 ===================== */
 
+.app-layout {
 
-.app-layout{
+    display: flex;
 
-    display:flex;
-
-    min-height:100vh;
-
+    min-height: 100vh;
 }
-
 
 
 /* =====================
-左侧导航
+   左侧导航
 ===================== */
 
+.sidebar {
 
-.sidebar{
+    width: 240px;
 
-    width:240px;
+    background: #1f2329;
 
-    background:#1f2329;
+    color: white;
 
-    color:white;
+    position: fixed;
 
-    position:fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
 
-    left:0;
-
-    top:0;
-
-    bottom:0;
-
-    padding:28px 18px;
-
+    padding: 28px 18px;
 }
 
 
+.brand h2 {
 
+    margin: 0;
 
-.brand h2{
+    font-size: 25px;
 
-    margin:0;
-
-    font-size:25px;
-
-    font-weight:700;
-
+    font-weight: 700;
 }
 
 
+.brand p {
 
-.brand p{
+    margin-top: 8px;
 
-    margin-top:8px;
+    color: #86909c;
 
-    color:#86909c;
-
-    font-size:13px;
-
+    font-size: 13px;
 }
 
 
+.menu {
 
-
-.menu{
-
-    margin-top:40px;
-
+    margin-top: 40px;
 }
 
 
+.menu-item {
 
+    display: block;
 
+    padding: 12px 14px;
 
-.menu-item{
+    margin-bottom: 7px;
 
-    display:block;
+    border-radius: 8px;
 
-    padding:12px 14px;
+    text-decoration: none;
 
-    margin-bottom:7px;
+    color: #c9cdd4;
 
-    border-radius:8px;
+    font-size: 15px;
 
-    text-decoration:none;
+    cursor: grab;
 
-    color:#c9cdd4;
-
-    font-size:15px;
-
-    cursor:grab;
-
-    user-select:none;
-
+    user-select: none;
 }
 
 
+.menu-item:hover {
 
-.menu-item:hover{
+    background: #30343b;
 
-    background:#30343b;
-
-    color:white;
-
+    color: white;
 }
 
 
+.menu-item.active {
 
-.menu-item.active{
+    background: #1677ff;
 
-    background:#1677ff;
-
-    color:white;
-
+    color: white;
 }
 
 
+.menu-item:active {
 
-
-
-.sidebar-footer{
-
-    position:absolute;
-
-    bottom:20px;
-
-    color:#86909c;
-
-    font-size:12px;
-
+    cursor: grabbing;
 }
 
 
+.sidebar-footer {
 
+    position: absolute;
 
+    bottom: 20px;
+
+    color: #86909c;
+
+    font-size: 12px;
+}
 
 
 /* =====================
-右侧区域
+   右侧区域
 ===================== */
 
+.content {
 
-.content{
+    margin-left: 240px;
 
-    margin-left:240px;
+    width: calc(100% - 240px);
 
-    width:calc(100% - 240px);
+    min-height: 100vh;
 
-    min-height:100vh;
+    padding: 40px;
 
-    padding:40px;
+    display: flex;
 
-    display:flex;
-
-    justify-content:center;
-
+    justify-content: center;
 }
 
 
+.container {
 
+    width: 100%;
 
-
-.container{
-
-    width:100%;
-
-    max-width:1100px;
-
+    max-width: 1100px;
 }
-
-
-
 
 
 /* =====================
-首页
+   首页
 ===================== */
 
+.dashboard-header {
 
-.dashboard-header{
+    background: white;
 
-    background:white;
+    border: 1px solid #e5e6eb;
 
-    border:1px solid #e5e6eb;
+    border-radius: 12px;
 
-    border-radius:12px;
+    padding: 30px;
 
-    padding:30px;
-
-    margin-bottom:30px;
-
+    margin-bottom: 30px;
 }
 
 
+.dashboard-header h1 {
 
-.dashboard-header h1{
+    margin: 0;
 
-    margin:0;
-
-    font-size:30px;
-
+    font-size: 30px;
 }
 
 
+.dashboard-header p {
 
-.dashboard-header p{
+    color: #86909c;
 
-    color:#86909c;
-
-    font-size:15px;
-
+    font-size: 15px;
 }
 
 
+.tool-grid {
 
-
-
-
-.tool-grid{
-
-    display:grid;
+    display: grid;
 
     grid-template-columns:
+        repeat(3, 300px);
 
-    repeat(3,300px);
+    justify-content: center;
 
-    justify-content:center;
-
-    gap:25px;
-
+    gap: 25px;
 }
 
 
+.tool-grid .tool-card {
 
+    height: 200px;
 
+    background: white;
 
+    border: 1px solid #e5e6eb;
 
-.tool-grid .tool-card{
+    border-radius: 14px;
 
+    padding: 26px;
 
-    height:200px;
+    text-decoration: none;
 
-    background:white;
+    color: #1f2329;
 
-    border:1px solid #e5e6eb;
-
-    border-radius:14px;
-
-    padding:26px;
-
-    text-decoration:none;
-
-    color:#1f2329;
-
-    transition:.2s;
-
-
+    transition: .2s;
 }
 
 
+.tool-grid .tool-card:hover {
 
-.tool-grid .tool-card:hover{
+    border-color: #1677ff;
 
-    border-color:#1677ff;
-
-    transform:translateY(-3px);
-
+    transform: translateY(-3px);
 }
 
 
+.tool-grid .tool-icon {
 
+    font-size: 34px;
 
-
-
-.tool-grid .tool-icon{
-
-
-    font-size:34px;
-
-    margin-bottom:20px;
-
-
+    margin-bottom: 20px;
 }
 
 
+.tool-grid .tool-card h2 {
 
+    margin: 0 0 10px;
 
-
-
-.tool-grid .tool-card h2{
-
-
-    margin:0 0 10px;
-
-    font-size:19px;
-
-
+    font-size: 19px;
 }
 
 
+.tool-grid .tool-card p {
 
+    margin: 0;
 
+    color: #86909c;
 
-.tool-grid .tool-card p{
+    font-size: 14px;
 
-
-    margin:0;
-
-    color:#86909c;
-
-    font-size:14px;
-
-    line-height:1.5;
-
-
+    line-height: 1.5;
 }
-
-/* =====================
-工具页面
-===================== */
-
-
-.back-btn{
-
-    display:inline-block;
-
-    margin-bottom:20px;
-
-    color:#1677ff;
-
-    text-decoration:none;
-
-}
-
-
-
-
-.hero{
-
-    margin-bottom:25px;
-
-}
-
-
-
-.hero h1{
-
-    margin:0 0 10px;
-
-    font-size:32px;
-
-}
-
-
-
-.hero p{
-
-    margin:0;
-
-    color:#86909c;
-
-    font-size:15px;
-
-}
-
-
-
-
-
 
 
 /* =====================
-工具卡片
+   工具页面
 ===================== */
 
+.back-btn {
 
-.container > .tool-card{
+    display: inline-block;
 
+    margin-bottom: 20px;
 
-    background:white;
+    color: #1677ff;
 
-    border:1px solid #e5e6eb;
-
-    border-radius:12px;
-
-    padding:25px;
-
-    margin-bottom:20px;
-
-
+    text-decoration: none;
 }
 
 
+.hero {
 
-
-
-.result-box{
-
-
-    background:white;
-
-    border:1px solid #e5e6eb;
-
-    border-radius:12px;
-
-    padding:25px;
-
-
+    margin-bottom: 25px;
 }
 
 
+.hero h1 {
 
+    margin: 0 0 10px;
+
+    font-size: 32px;
+}
+
+
+.hero p {
+
+    margin: 0;
+
+    color: #86909c;
+
+    font-size: 15px;
+}
 
 
 /* =====================
-输入区域
+   工具卡片
 ===================== */
 
+.container > .tool-card {
 
-.input-row{
+    background: white;
 
+    border: 1px solid #e5e6eb;
 
-    display:flex;
+    border-radius: 12px;
 
-    gap:20px;
+    padding: 24px;
 
-    margin-bottom:18px;
-
-
+    margin-bottom: 14px;
 }
 
 
+.tool-card h2 {
 
-.input-row > div{
+    font-size: 20px;
 
-
-    flex:1;
-
-
+    margin-top: 0;
 }
 
 
+.tool-card p {
 
-label{
+    font-size: 15px;
 
-
-    display:block;
-
-    color:#4e5969;
-
-    margin-bottom:7px;
-
-    font-size:15px;
-
-
+    line-height: 1.6;
 }
 
 
+.result-box {
 
+    background: white;
 
+    border: 1px solid #e5e6eb;
 
-input{
+    border-radius: 12px;
 
+    padding: 24px;
 
-    width:100%;
-
-    height:42px;
-
-    border:1px solid #c9cdd4;
-
-    border-radius:8px;
-
-    padding:0 12px;
-
-    font-size:15px;
-
-
+    margin-bottom: 14px;
 }
-
-
-
-input:focus{
-
-
-    outline:none;
-
-    border-color:#1677ff;
-
-
-}
-
-
-
-
-
-
-
-/* =====================
-按钮
-===================== */
-
-
-.calculate-btn{
-
-
-    width:100%;
-
-    height:42px;
-
-    background:#1677ff;
-
-    color:white;
-
-    border:none;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    font-size:15px;
-
-
-}
-
-
-
-.calculate-btn:hover{
-
-
-    background:#0e5fd8;
-
-
-}
-
-
-
-
-
-
-
-
-/* =====================
-表格
-===================== */
-
-
-.table-box{
-
-
-    overflow:auto;
-
-
-}
-
-
-
-
-
-table{
-
-
-    width:100%;
-
-    border-collapse:collapse;
-
-    font-size:15px;
-
-
-}
-
-
-
-
-
-th,td{
-
-
-    padding:12px;
-
-    border-bottom:1px solid #eee;
-
-
-}
-
-
-
-
-table th{
-
-
-    text-align:center;
-
-    vertical-align:middle;
-
-
-}
-
-
-
-
-
-.table-input{
-
-
-    width:100%;
-
-    height:36px;
-
-    border:1px solid #e5e6eb;
-
-    border-radius:7px;
-
-    padding:0 10px;
-
-    background:white;
-
-    font-size:14px;
-
-
-}
-
-
-
-
-.table-input:focus{
-
-
-    border-color:#1677ff;
-
-    outline:none;
-
-
-}
-
-
-
-
-
-
-
-/* =====================
-结果区域
-===================== */
 
 
 .result-box h2,
-.result-box h3{
+.result-box h3 {
 
+    font-size: 20px;
 
-    font-size:20px;
-
-    margin-top:0;
-
-
+    margin-top: 0;
 }
 
 
+.result-box p {
 
+    font-size: 15px;
 
-.result-box p{
-
-
-    font-size:15px;
-
-    line-height:1.8;
-
-
+    line-height: 1.8;
 }
-
-
-
-
 
 
 /* =====================
-普通卡片标题
+   输入区域
 ===================== */
 
+.input-row {
 
-.tool-card h2{
+    display: flex;
 
+    gap: 20px;
 
-    font-size:20px;
-
-
+    margin-bottom: 12px;
 }
 
 
+.input-row > div {
 
-.tool-card p{
+    flex: 1;
 
-
-    font-size:15px;
-
-    line-height:1.6;
-
-
+    min-width: 0;
 }
 
 
+label {
+
+    display: block;
+
+    color: #4e5969;
+
+    margin-bottom: 5px;
+
+    font-size: 15px;
+}
 
 
+input {
+
+    width: 100%;
+
+    height: 40px;
+
+    border: 1px solid #c9cdd4;
+
+    border-radius: 8px;
+
+    padding: 0 12px;
+
+    font-size: 15px;
+
+    background: white;
+}
 
 
-/* =====================
-日期选择优化
-===================== */
+input:focus {
+
+    outline: none;
+
+    border-color: #1677ff;
+}
 
 
 input[type="month"],
-input[type="date"]{
+input[type="date"] {
 
-
-    cursor:pointer;
-
-
-}
-
-/* =====================
-寄样审核状态
-===================== */
-
-
-.sample-green{
-
-    color:#00a870;
-
-    font-weight:600;
-
+    cursor: pointer;
 }
 
 
+select {
 
-.sample-yellow{
+    width: 100%;
 
-    color:#d89614;
+    height: 40px;
 
-    font-weight:600;
+    border: 1px solid #c9cdd4;
 
+    border-radius: 8px;
+
+    padding: 0 12px;
+
+    background: white;
+
+    font-size: 15px;
+
+    color: #1f2329;
 }
 
 
+select:focus {
 
-.sample-red{
+    outline: none;
 
-    color:#f53f3f;
-
-    font-weight:600;
-
+    border-color: #1677ff;
 }
-
-
-
-
 
 
 /* =====================
-删除按钮
+   按钮
 ===================== */
 
+button {
 
-table button{
-
-
-    border:none;
-
-    background:#f2f3f5;
-
-    padding:7px 12px;
-
-    border-radius:7px;
-
-    cursor:pointer;
-
-    font-size:14px;
-
-
+    font-family: inherit;
 }
 
 
+.calculate-btn {
 
-table button:hover{
+    width: 100%;
 
+    height: 42px;
 
-    background:#e5e6eb;
+    background: #1677ff;
 
+    color: white;
 
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 15px;
 }
 
 
+.calculate-btn:hover {
 
-
-
+    background: #0e5fd8;
+}
 
 
 /* =====================
-寄样审核表格宽度
+   表格
 ===================== */
 
+.table-box {
+
+    overflow: auto;
+}
+
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 15px;
+}
+
+
+th,
+td {
+
+    padding: 10px;
+
+    border-bottom: 1px solid #eee;
+}
+
+
+table th {
+
+    text-align: center;
+
+    vertical-align: middle;
+}
+
+
+.table-input {
+
+    width: 100%;
+
+    height: 36px;
+
+    border: 1px solid #e5e6eb;
+
+    border-radius: 7px;
+
+    padding: 0 10px;
+
+    background: white;
+
+    font-size: 14px;
+}
+
+
+.table-input:focus {
+
+    border-color: #1677ff;
+
+    outline: none;
+}
+
+
+/* =====================
+   寄样审核状态
+===================== */
+
+.sample-green {
+
+    color: #00a870;
+
+    font-weight: 600;
+}
+
+
+.sample-yellow {
+
+    color: #d89614;
+
+    font-weight: 600;
+}
+
+
+.sample-red {
+
+    color: #f53f3f;
+
+    font-weight: 600;
+}
+
+
+/* =====================
+   表格按钮
+===================== */
+
+table button {
+
+    border: none;
+
+    background: #f2f3f5;
+
+    padding: 7px 12px;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+table button:hover {
+
+    background: #e5e6eb;
+}
+
+
+/* =====================
+   寄样审核表格宽度
+===================== */
 
 #sample-list th:nth-child(1),
-#sample-list td:nth-child(1){
+#sample-list td:nth-child(1) {
 
-
-    width:160px;
-
-
+    width: 160px;
 }
-
-
-
 
 
 #sample-list th:nth-child(2),
-#sample-list td:nth-child(2){
+#sample-list td:nth-child(2) {
 
-
-    width:180px;
-
-
+    width: 180px;
 }
-
-
-
 
 
 #sample-list th:nth-child(3),
-#sample-list td:nth-child(3){
+#sample-list td:nth-child(3) {
 
+    width: 140px;
 
-    width:140px;
-
-    text-align:center;
-
-
+    text-align: center;
 }
-
-
-
 
 
 #sample-list th:nth-child(4),
-#sample-list td:nth-child(4){
+#sample-list td:nth-child(4) {
 
+    width: 140px;
 
-    width:140px;
-
-    text-align:center;
-
-
+    text-align: center;
 }
-
-
-
 
 
 #sample-list th:nth-child(5),
-#sample-list td:nth-child(5){
+#sample-list td:nth-child(5) {
 
-
-    width:400px;
-
-
+    width: 400px;
 }
 
 
+#sample-list td:nth-child(5) input {
 
+    width: 100%;
 
-
-#sample-list td:nth-child(5) input{
-
-
-    width:100%;
-
-    min-width:350px;
-
-
+    min-width: 350px;
 }
-
-
-
-
 
 
 #sample-list th:nth-child(6),
-#sample-list td:nth-child(6){
+#sample-list td:nth-child(6) {
 
+    width: 80px;
 
-    width:80px;
-
-    text-align:center;
-
-
+    text-align: center;
 }
-
-
-
-
-
-
 
 
 /* =====================
-排序区域
+   排序区域
 ===================== */
 
+.list-header {
 
-.list-header{
+    display: flex;
 
+    justify-content: space-between;
 
-    display:flex;
+    align-items: center;
 
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
-
+    margin-bottom: 20px;
 }
 
 
+.sort-box {
 
+    display: flex;
 
-.sort-box{
-
-
-    display:flex;
-
-    gap:10px;
-
-
+    gap: 10px;
 }
 
 
+.sort-box button {
 
+    border: 1px solid #e5e6eb;
 
-.sort-box button{
+    background: white;
 
+    padding: 8px 14px;
 
-    border:1px solid #e5e6eb;
+    border-radius: 7px;
 
-    background:white;
+    cursor: pointer;
 
-    padding:8px 14px;
-
-    border-radius:7px;
-
-    cursor:pointer;
-
-    font-size:14px;
-
-
+    font-size: 14px;
 }
 
 
+.sort-box button:hover {
 
+    border-color: #1677ff;
 
-
-.sort-box button:hover{
-
-
-    border-color:#1677ff;
-
-    color:#1677ff;
-
-
+    color: #1677ff;
 }
-
-
-
-
-
-
 
 
 /* =====================
-导航拖动效果
+   TC 页面
 ===================== */
 
+.compact-result p {
 
-.menu-item:active{
+    margin: 8px 0;
 
-
-    cursor:grabbing;
-
-
+    line-height: 1.5;
 }
 
 
+.tc-final {
+
+    margin-top: 15px !important;
+
+    font-size: 18px;
+}
 
 
+/* =====================================================
+   达人管理
+   两列卡片布局
+===================================================== */
 
+#adminCreatorList {
 
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    width: 100%;
+
+    margin-top: 20px;
+
+    align-items: stretch;
+}
 
 
 /* =====================
-移动端适配
+   达人管理卡片
 ===================== */
 
+#adminCreatorList .creator-card {
 
-@media(max-width:900px){
+    position: relative;
 
+    width: 100%;
 
+    min-width: 0;
 
-.sidebar{
+    min-height: 285px;
 
+    margin: 0;
 
-    position:relative;
+    padding: 22px;
 
-    width:100%;
+    background: #ffffff;
 
-    height:auto;
+    border: 1px solid #e5e6eb;
 
+    border-radius: 14px;
 
+    transition:
+        transform .2s,
+        box-shadow .2s,
+        border-color .2s;
+
+    overflow: hidden;
 }
 
 
+#adminCreatorList .creator-card:hover {
 
+    transform: translateY(-3px);
 
-.app-layout{
+    border-color: #d0d5dd;
 
-
-    flex-direction:column;
-
-
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, .06);
 }
-
-
-
-
-
-.content{
-
-
-    margin-left:0;
-
-    width:100%;
-
-    padding:20px;
-
-
-}
-
-
-
-
-
-.container{
-
-
-    max-width:100%;
-
-
-}
-
-
-
-
-.tool-grid{
-
-
-    grid-template-columns:1fr;
-
-
-}
-
-
-
-
-
-.input-row{
-
-
-    flex-direction:column;
-
-
-}
-
-
-
-}
-
-
-
-
-
-
 
 
 /* =====================
-细节优化
+   达人顶部
 ===================== */
 
+.creator-top {
 
-button{
+    display: flex;
 
+    align-items: center;
 
-    font-family:inherit;
+    gap: 14px;
 
+    margin-bottom: 20px;
 
+    min-width: 0;
 }
 
 
+.creator-avatar {
 
+    width: 58px;
 
+    height: 58px;
 
-strong{
+    flex-shrink: 0;
 
+    border-radius: 50%;
 
-    font-weight:700;
+    background: #f2f3f5;
 
+    display: flex;
 
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 27px;
 }
 
 
+.creator-title {
 
+    flex: 1;
 
+    min-width: 0;
 
-
-::-webkit-scrollbar{
-
-
-    width:8px;
-
-    height:8px;
-
-
+    padding-right: 35px;
 }
 
 
+.creator-card h3 {
 
+    margin: 0 0 5px;
 
+    font-size: 18px;
 
-::-webkit-scrollbar-thumb{
+    font-weight: 600;
 
+    color: #1f2329;
 
-    background:#c9cdd4;
+    white-space: nowrap;
 
-    border-radius:10px;
+    overflow: hidden;
 
-
+    text-overflow: ellipsis;
 }
 
 
+.creator-product {
 
+    color: #86909c;
 
-::-webkit-scrollbar-track{
+    font-size: 13px;
 
+    white-space: nowrap;
 
-    background:#f5f6f8;
+    overflow: hidden;
 
-
+    text-overflow: ellipsis;
 }
+
 
 /* =====================
-TC页面紧凑优化
+   身高体重
 ===================== */
 
+.creator-body {
 
-.compact-result p{
+    display: grid;
 
-    margin:8px 0;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
 
-    line-height:1.5;
+    gap: 12px;
+
+    margin-bottom: 13px;
+}
+
+
+.creator-stat {
+
+    min-width: 0;
+
+    background: #f7f8fa;
+
+    border-radius: 10px;
+
+    padding: 12px 14px;
+}
+
+
+.creator-stat .stat-label {
+
+    display: block;
+
+    color: #86909c;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+}
+
+
+.creator-stat strong {
+
+    display: block;
+
+    font-size: 16px;
+
+    color: #1f2329;
+
+    white-space: nowrap;
+}
+
+
+/* =====================
+   推荐尺码
+===================== */
+
+.creator-size {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    min-width: 0;
+
+    background: #f7f8fa;
+
+    border-radius: 10px;
+
+    padding: 12px 14px;
+
+    margin-bottom: 11px;
+
+    font-size: 14px;
+
+    color: #4e5969;
+}
+
+
+.creator-size span {
+
+    min-width: 0;
+}
+
+
+.creator-size strong {
+
+    flex-shrink: 0;
+
+    font-size: 19px;
+
+    color: #1677ff;
+}
+
+
+/* =====================
+   穿着效果
+===================== */
+
+.creator-fit {
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 8px;
+
+    min-width: 0;
+
+    margin-bottom: 17px;
+
+    font-size: 14px;
+}
+
+
+.fit-label {
+
+    flex-shrink: 0;
+
+    color: #86909c;
+}
+
+
+.fit-text {
+
+    min-width: 0;
+
+    color: #00a870;
+
+    font-weight: 500;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* =====================
+   视频按钮
+===================== */
+
+.video-btn {
+
+    width: 100%;
+
+    height: 40px;
+
+    background: #1677ff;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-family: inherit;
+
+    transition: .2s;
+}
+
+
+.video-btn:hover {
+
+    background: #0e5fd8;
+}
+
+
+.video-disabled {
+
+    background: #f2f3f5;
+
+    color: #86909c;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================
+   删除按钮
+===================== */
+
+.admin-delete-btn {
+
+    position: absolute;
+
+    top: 14px;
+
+    right: 14px;
+
+    width: 32px;
+
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid #e5e6eb;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #86909c;
+
+    font-size: 14px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .15s ease;
+
+    z-index: 2;
+}
+
+
+.admin-delete-btn:hover {
+
+    background: #fff1f0;
+
+    border-color: #ffccc7;
+
+    color: #f53f3f;
+}
+
+
+.admin-delete-btn:active {
+
+    transform: scale(.92);
+}
+
+
+/* =====================
+   达人数据为空
+===================== */
+
+.creator-empty {
+
+    background: white;
+
+    border: 1px dashed #d9d9d9;
+
+    border-radius: 12px;
+
+    padding: 35px;
+
+    text-align: center;
+
+    color: #86909c;
+
+    line-height: 2;
 
 }
 
 
+.creator-empty span {
 
-.tc-final{
+    font-size: 13px;
+}
 
-    margin-top:15px !important;
 
-    font-size:18px;
+/* =====================
+   真人尺码参考
+===================== */
+
+.size-match-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 16px 18px;
+
+    margin-bottom: 18px;
+
+    background: #f7f8fa;
+
+    border: 1px solid #e5e6eb;
+
+    border-radius: 10px;
+}
+
+
+.size-match-title {
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #1f2329;
+
+    margin-bottom: 6px;
+}
+
+
+.size-match-subtitle {
+
+    color: #86909c;
+
+    font-size: 13px;
+}
+
+
+.size-match-divider {
+
+    margin: 0 6px;
+
+    color: #c9cdd4;
+}
+
+
+/* =====================
+   尺码助手达人列表
+===================== */
+
+.creator-match-list {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    width: 100%;
+}
+
+
+/* =====================
+   尺码助手达人卡片
+===================== */
+
+.size-creator-card {
+
+    position: relative;
+
+    min-width: 0;
+
+    padding: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e6eb;
+
+    border-radius: 14px;
+}
+
+
+/* =====================
+   排名
+===================== */
+
+.size-match-rank {
+
+    position: absolute;
+
+    top: 14px;
+
+    right: 14px;
+}
+
+
+.match-rank {
+
+    width: 28px;
+
+    height: 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f2f3f5;
+
+    color: #86909c;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.match-rank-best {
+
+    background: #e8f3ff;
+
+    color: #1677ff;
+}
+
+
+/* =====================
+   达人名称
+===================== */
+
+.size-creator-name-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    min-width: 0;
+}
+
+
+.size-creator-name-row h3 {
+
+    margin: 0 0 5px;
+}
+
+
+/* =====================
+   最接近标签
+===================== */
+
+.best-match {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    height: 22px;
+
+    padding: 0 8px;
+
+    border-radius: 6px;
+
+    background: #e8f3ff;
+
+    color: #1677ff;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    margin-bottom: 5px;
+}
+
+
+/* =====================
+   身材差距
+===================== */
+
+.size-match-diff {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 11px 14px;
+
+    margin-bottom: 14px;
+
+    background: #f7f8fa;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+
+    color: #86909c;
+}
+
+
+.size-match-diff > div {
+
+    color: #4e5969;
+
+    white-space: nowrap;
+}
+
+
+.size-match-diff strong {
+
+    color: #1f2329;
+
+    font-weight: 600;
+}
+
+
+.diff-dot {
+
+    margin: 0 5px;
+
+    color: #c9cdd4;
+}
+
+
+/* =====================
+   尺码查询结果为空
+===================== */
+
+.size-result-empty {
+
+    padding: 35px 20px;
+
+    text-align: center;
+
+    color: #86909c;
+
+    line-height: 1.8;
+}
+
+
+.size-result-empty strong {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #1f2329;
+
+    font-size: 16px;
+}
+
+
+.size-result-empty span {
+
+    display: block;
+
+    color: #86909c;
+
+    font-size: 13px;
+}
+
+
+/* =====================
+   尺码助手匹配结果
+===================== */
+
+.matched-creator-list {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    width: 100%;
+
+    margin-top: 18px;
+}
+
+
+.matched-creator-card {
+
+    position: relative;
+
+    width: 100%;
+
+    min-width: 0;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e6eb;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    display: flex;
+
+    gap: 14px;
+
+    transition:
+        transform .2s,
+        box-shadow .2s,
+        border-color .2s;
+
+    overflow: hidden;
+}
+
+
+.matched-creator-card:hover {
+
+    transform: translateY(-3px);
+
+    border-color: #d0d5dd;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, .06);
+}
+
+
+/* =====================
+   匹配结果标题
+===================== */
+
+.matched-creator-title {
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #1f2329;
+
+    margin-bottom: 14px;
+}
+
+
+/* =====================
+   匹配达人头像
+===================== */
+
+.matched-creator-avatar {
+
+    width: 52px;
+
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #f2f3f5;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 24px;
+}
+
+
+/* =====================
+   匹配达人信息
+===================== */
+
+.matched-creator-info {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+
+.matched-creator-info h3 {
+
+    margin: 0 0 4px;
+
+    font-size: 17px;
+
+    font-weight: 600;
+
+    color: #1f2329;
+}
+
+
+.matched-product {
+
+    color: #86909c;
+
+    font-size: 12px;
+
+    margin-bottom: 12px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =====================
+   匹配达人身高体重
+===================== */
+
+.matched-body {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+}
+
+
+.matched-body span {
+
+    min-width: 0;
+
+    background: #f7f8fa;
+
+    border-radius: 8px;
+
+    padding: 8px 10px;
+
+    color: #4e5969;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* =====================
+   匹配达人推荐尺码
+===================== */
+
+.matched-size {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    min-width: 0;
+
+    background: #f7f8fa;
+
+    border-radius: 8px;
+
+    padding: 9px 11px;
+
+    margin-bottom: 9px;
+
+    color: #4e5969;
+
+    font-size: 13px;
+}
+
+
+.matched-size strong {
+
+    color: #1677ff;
+
+    font-size: 18px;
+
+    flex-shrink: 0;
+}
+
+
+/* =====================
+   匹配达人穿着效果
+===================== */
+
+.matched-fit {
+
+    color: #00a870;
+
+    font-size: 13px;
+
+    margin-bottom: 12px;
+}
+
+
+.matched-creator-card .video-btn {
+
+    width: 100%;
+
+    height: 36px;
+
+    margin-top: 2px;
+
+    font-size: 13px;
+}
+
+
+/* =====================
+   强调
+===================== */
+
+strong {
+
+    font-weight: 700;
+}
+
+
+/* =====================
+   滚动条
+===================== */
+
+::-webkit-scrollbar {
+
+    width: 8px;
+
+    height: 8px;
+}
+
+
+::-webkit-scrollbar-thumb {
+
+    background: #c9cdd4;
+
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-track {
+
+    background: #f5f6f8;
+}
+
+
+/* =====================================================
+   尺码助手 #creatorResult
+   防止影响达人管理
+===================================================== */
+
+#creatorResult .matched-creator-list {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    width: 100%;
+
+    margin-top: 18px;
+}
+
+
+#creatorResult .matched-creator-card {
+
+    position: relative;
+
+    width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e6eb;
+
+    border-radius: 14px;
+
+    padding: 22px;
+
+    min-height: 230px;
+
+    overflow: hidden;
+}
+
+
+#creatorResult .matched-creator-avatar {
+
+    width: 52px;
+
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #f2f3f5;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 25px;
+
+    margin-bottom: 14px;
+}
+
+
+#creatorResult .matched-creator-info {
+
+    width: 100%;
+
+    min-width: 0;
+}
+
+
+#creatorResult .matched-creator-info h3 {
+
+    margin: 0 0 5px;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    color: #1f2329;
+}
+
+
+#creatorResult .matched-product {
+
+    color: #86909c;
+
+    font-size: 13px;
+
+    margin-bottom: 16px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+#creatorResult .matched-body {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 11px;
+}
+
+
+#creatorResult .matched-body span {
+
+    display: block;
+
+    min-width: 0;
+
+    padding: 11px 12px;
+
+    background: #f7f8fa;
+
+    border-radius: 9px;
+
+    color: #4e5969;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+#creatorResult .matched-size {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    min-width: 0;
+
+    padding: 11px 13px;
+
+    margin-bottom: 10px;
+
+    background: #f7f8fa;
+
+    border-radius: 9px;
+
+    color: #4e5969;
+
+    font-size: 13px;
+}
+
+
+#creatorResult .matched-size strong {
+
+    color: #1677ff;
+
+    font-size: 18px;
+
+    flex-shrink: 0;
+}
+
+
+#creatorResult .matched-fit {
+
+    margin-bottom: 13px;
+
+    color: #00a870;
+
+    font-size: 13px;
+}
+
+
+#creatorResult .matched-creator-card .video-btn {
+
+    width: 100%;
+
+    height: 38px;
+}
+
+
+/* =====================
+   移动端
+===================== */
+
+@media (max-width: 1100px) {
+
+    .tool-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(280px, 1fr));
+
+    }
 
 }
 
 
+@media (max-width: 900px) {
+
+    .sidebar {
+
+        position: relative;
+
+        width: 100%;
+
+        height: auto;
+    }
 
 
+    .app-layout {
 
-/* TC页面卡片间距优化 */
+        flex-direction: column;
+    }
 
 
-.container > .tool-card{
+    .content {
 
-    padding:24px;
+        margin-left: 0;
 
-    margin-bottom:14px;
+        width: 100%;
+
+        padding: 20px;
+    }
+
+
+    .container {
+
+        max-width: 100%;
+    }
+
+
+    .tool-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .input-row {
+
+        flex-direction: column;
+    }
+
+
+    /* 达人管理小屏幕一列 */
+
+    #adminCreatorList {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    /* 尺码助手一列 */
+
+    .creator-match-list {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .matched-creator-list {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    #creatorResult .matched-creator-list {
+
+        grid-template-columns: 1fr;
+
+    }
 
 }
 
 
+@media (max-width: 700px) {
 
-.result-box{
+    .size-match-header {
 
-    padding:24px;
-
-    margin-bottom:14px;
-
-}
+        align-items: flex-start;
+    }
 
 
+    .size-match-diff {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
 
 
+    #creatorResult .matched-creator-list {
 
-/* 输入区域压缩 */
+        grid-template-columns: 1fr;
 
+        gap: 14px;
 
-.input-row{
-
-    margin-bottom:12px;
-
-}
-
-
-
-label{
-
-    margin-bottom:5px;
+    }
 
 }
 
+/* =========================================
+   达人管理：右上角操作按钮
+========================================= */
 
-
-input{
-
-    height:40px;
-
+.creator-card {
+    position: relative;
 }
 
 
+/* 操作按钮容器 */
 
+.creator-actions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
 
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-/* 表格压缩 */
-
-
-table th,
-table td{
-
-    padding:10px;
-
+    z-index: 10;
 }
 
 
+/* 编辑按钮 */
 
-table{
+.admin-edit-btn {
+    border: 1px solid #1677ff;
+    background: #ffffff;
+    color: #1677ff;
 
-    font-size:15px;
+    width: 34px;
+    height: 34px;
 
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: all 0.2s ease;
+}
+
+
+.admin-edit-btn:hover {
+    background: #e8f3ff;
+}
+
+
+/* 删除按钮 */
+
+.admin-delete-btn {
+    position: static !important;
+
+    border: 1px solid #f53f3f;
+    background: #ffffff;
+    color: #f53f3f;
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: all 0.2s ease;
+}
+
+
+.admin-delete-btn:hover {
+    background: #fff1f0;
+}
+
+
+/* 防止右上角按钮遮挡达人信息 */
+
+.creator-top {
+    padding-right: 100px;
 }

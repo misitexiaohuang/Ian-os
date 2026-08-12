@@ -1,0 +1,567 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>达人数据导入</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- =========================
+    左侧导航
+    ========================= -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <h2>
+                Ian OS
+            </h2>
+
+            <p>
+                TikTok运营效率工具
+            </p>
+
+        </div>
+
+
+        <div
+            class="menu"
+            id="menu"
+        ></div>
+
+
+        <div class="sidebar-footer">
+
+            Ian OS v1.0
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =========================
+    右侧内容
+    ========================= -->
+
+    <main class="content">
+
+
+        <div class="container">
+
+
+            <!-- =========================
+            页面标题
+            ========================= -->
+
+            <div class="hero">
+
+                <h1>
+                    📥 达人数据导入
+                </h1>
+
+                <p>
+                    批量导入达人 Handle、寄样尺码身高体重、产品和视频链接
+                </p>
+
+            </div>
+
+
+
+            <!-- =========================
+            下载模板
+            ========================= -->
+
+            <div class="tool-card">
+
+
+                <h2>
+                    第一步：下载导入模板
+                </h2>
+
+
+                <p>
+                    请使用模板填写达人数据，不需要手动拆分尺码、身高和体重。
+                </p>
+
+
+                <div
+                    style="
+                        background:#f7f8fa;
+                        border:1px solid #e5e6eb;
+                        border-radius:10px;
+                        padding:16px;
+                        margin:18px 0;
+                        line-height:1.8;
+                    "
+                >
+
+                    <strong>
+                        Excel 只需要以下 4 列：
+                    </strong>
+
+                    <br>
+
+                    ① 达人Handle
+
+                    <br>
+
+                    ② 寄样尺码+身高体重
+
+                    <br>
+
+                    ③ 产品
+
+                    <br>
+
+                    ④ 视频链接
+
+                    <br><br>
+
+                    <span style="color:#86909c;">
+
+                        示例：
+
+                        M(H5'10,W173lbs)
+
+                    </span>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="calculate-btn"
+                    id="downloadTemplateBtn"
+                >
+
+                    📥 下载 Excel 导入模板
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =========================
+            上传文件
+            ========================= -->
+
+            <div class="tool-card">
+
+
+                <h2>
+                    第二步：上传 Excel
+                </h2>
+
+
+                <p>
+                    直接上传你们现有的达人寄样跟进产出表中整理好的数据。
+                </p>
+
+
+                <div
+                    style="
+                        margin-top:20px;
+                    "
+                >
+
+                    <label>
+                        选择 Excel 文件
+                    </label>
+
+
+                    <input
+                        type="file"
+                        id="excelFile"
+                        accept=".xlsx,.xls,.csv"
+                    >
+
+                </div>
+
+
+                <div
+                    id="fileInfo"
+                    style="
+                        margin-top:12px;
+                        color:#86909c;
+                        font-size:13px;
+                    "
+                >
+
+                    尚未选择文件
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =========================
+            识别说明
+            ========================= -->
+
+            <div class="tool-card">
+
+
+                <h2>
+                    第三步：自动识别
+                </h2>
+
+
+                <p>
+                    系统会自动读取「寄样尺码+身高体重」并进行拆分。
+                </p>
+
+
+                <div
+                    style="
+                        background:#f7f8fa;
+                        border:1px solid #e5e6eb;
+                        border-radius:10px;
+                        padding:18px;
+                        margin-top:18px;
+                    "
+                >
+
+                    <div style="margin-bottom:12px;">
+
+                        <strong>
+                            原始数据
+                        </strong>
+
+                        <br>
+
+                        <span style="color:#1677ff;">
+
+                            M(H5'10,W173lbs)
+
+                        </span>
+
+                    </div>
+
+
+                    <div style="margin-bottom:12px;">
+
+                        <strong>
+                            自动解析
+                        </strong>
+
+                    </div>
+
+
+                    <div
+                        style="
+                            display:grid;
+                            grid-template-columns:repeat(2,1fr);
+                            gap:10px;
+                        "
+                    >
+
+                        <div
+                            style="
+                                background:white;
+                                border-radius:8px;
+                                padding:10px;
+                            "
+                        >
+
+                            推荐尺码
+
+                            <strong>
+                                M
+                            </strong>
+
+                        </div>
+
+
+                        <div
+                            style="
+                                background:white;
+                                border-radius:8px;
+                                padding:10px;
+                            "
+                        >
+
+                            Height
+
+                            <strong>
+                                5'10"
+                            </strong>
+
+                        </div>
+
+
+                        <div
+                            style="
+                                background:white;
+                                border-radius:8px;
+                                padding:10px;
+                            "
+                        >
+
+                            Weight
+
+                            <strong>
+                                173 lbs
+                            </strong>
+
+                        </div>
+
+
+                        <div
+                            style="
+                                background:white;
+                                border-radius:8px;
+                                padding:10px;
+                            "
+                        >
+
+                            自动转换
+
+                            <strong>
+                                177.8 cm / 78.5 kg
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =========================
+            导入预览
+            ========================= -->
+
+            <div class="tool-card">
+
+
+                <div class="list-header">
+
+                    <div>
+
+                        <h2>
+                            导入预览
+                        </h2>
+
+                        <p>
+                            确认无误后再导入 Supabase
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="importResult"
+                    style="
+                        color:#86909c;
+                        padding:20px 0;
+                    "
+                >
+
+                    请先上传 Excel 文件
+
+                </div>
+
+
+                <!-- =====================
+                预览表格
+                ===================== -->
+
+                <div
+                    id="previewWrapper"
+                    class="table-box"
+                    style="display:none;"
+                >
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    达人Handle
+                                </th>
+
+                                <th>
+                                    原始尺码身高体重
+                                </th>
+
+                                <th>
+                                    推荐尺码
+                                </th>
+
+                                <th>
+                                    身高
+                                </th>
+
+                                <th>
+                                    体重
+                                </th>
+
+                                <th>
+                                    产品
+                                </th>
+
+                                <th>
+                                    视频链接
+                                </th>
+
+                                <th>
+                                    状态
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody
+                            id="previewBody"
+                        >
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- =====================
+                确认导入
+                ===================== -->
+
+                <button
+                    type="button"
+                    id="importBtn"
+                    class="calculate-btn"
+                    style="
+                        margin-top:20px;
+                        display:none;
+                    "
+                >
+
+                    ✅ 确认导入达人数据
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =========================
+            导入结果
+            ========================= -->
+
+            <div
+                class="result-box"
+                id="finalResult"
+            >
+
+                <h3>
+                    导入结果
+                </h3>
+
+
+                <p id="finalResultText">
+
+                    等待操作...
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================
+Supabase
+========================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+
+<script
+    src="supabase.js?v=4"
+></script>
+
+
+
+<!-- =========================
+SheetJS / XLSX
+========================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+></script>
+
+
+
+<!-- =========================
+达人导入
+========================= -->
+
+<script
+    src="creator-import.js?v=4"
+></script>
+
+
+
+<!-- =========================
+导航
+========================= -->
+
+<script
+    src="nav.js?v=4"
+></script>
+
+
+</body>
+
+</html>
+```
