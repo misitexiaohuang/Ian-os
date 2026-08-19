@@ -9,6 +9,13 @@ const menuData = [
 
 
     {
+        id:"shop-data",
+        name:"📊 店铺数据分析",
+        url:"shop-data.html"
+    },
+
+
+    {
     id:"size-helper",
     name:"👕 尺码助手",
     url:"size-helper.html"

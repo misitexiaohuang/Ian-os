@@ -1,0 +1,3327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TikTok Shop 店铺数据</title>
+
+
+    <!-- =========================
+         网站原有样式
+    ========================== -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <!-- =========================
+         SheetJS
+         Excel读取
+    ========================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+    </script>
+
+
+    <!-- =================================================
+         TikTok Shop 店铺数据页面专用 CSS
+    ================================================== -->
+
+    <style>
+
+
+        /* =================================================
+           主内容区域
+        ================================================= */
+
+        .shop-main-content {
+
+            margin-left: 276px;
+
+            width: calc(100% - 276px);
+
+            min-height: 100vh;
+
+            padding: 32px 36px;
+
+            box-sizing: border-box;
+
+        }
+
+
+        /* =================================================
+           通用卡片
+        ================================================= */
+
+        .shop-card {
+
+            width: 100%;
+
+            background: #ffffff;
+
+            border-radius: 16px;
+
+            padding: 28px;
+
+            box-sizing: border-box;
+
+            margin-bottom: 24px;
+
+            box-shadow:
+                0 4px 18px rgba(0, 0, 0, 0.06);
+
+        }
+
+
+        /* =================================================
+           页面标题
+        ================================================= */
+
+        .shop-page-title {
+
+            margin-bottom: 24px;
+
+        }
+
+
+        .shop-page-title h1 {
+
+            margin: 0 0 8px 0;
+
+            font-size: 28px;
+
+        }
+
+
+        .shop-page-title p {
+
+            margin: 0;
+
+            color: #777;
+
+        }
+
+
+        /* =================================================
+           上传
+        ================================================= */
+
+        .shop-upload-title h2 {
+
+            margin: 0 0 8px 0;
+
+        }
+
+
+        .shop-upload-title p {
+
+            margin: 0;
+
+            color: #777;
+
+        }
+
+
+        .shop-upload-box {
+
+            margin-top: 24px;
+
+            padding: 30px;
+
+            border: 2px dashed #d9d9d9;
+
+            border-radius: 14px;
+
+            text-align: center;
+
+        }
+
+
+        #excelFile {
+
+            display: none;
+
+        }
+
+
+        .shop-file-label {
+
+            display: inline-block;
+
+            padding: 12px 24px;
+
+            border-radius: 10px;
+
+            background: #111;
+
+            color: #fff;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+        }
+
+
+        .shop-file-label:hover {
+
+            opacity: 0.85;
+
+        }
+
+
+        .shop-selected-file {
+
+            margin-top: 14px;
+
+            color: #666;
+
+            font-size: 14px;
+
+        }
+
+
+        .shop-upload-btn {
+
+            margin-top: 18px;
+
+            padding: 12px 26px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #1677ff;
+
+            color: #fff;
+
+            font-size: 15px;
+
+            cursor: pointer;
+
+        }
+
+
+        .shop-upload-btn:hover {
+
+            opacity: 0.9;
+
+        }
+
+
+        .shop-upload-btn:disabled {
+
+            opacity: 0.5;
+
+            cursor: not-allowed;
+
+        }
+
+
+        /* =================================================
+           上传状态
+        ================================================= */
+
+        .shop-upload-status {
+
+            margin-top: 18px;
+
+            padding: 12px 16px;
+
+            border-radius: 10px;
+
+            display: none;
+
+        }
+
+
+        .shop-upload-status.success {
+
+            display: block;
+
+            background: #f0f9f4;
+
+            color: #16803c;
+
+        }
+
+
+        .shop-upload-status.error {
+
+            display: block;
+
+            background: #fff1f0;
+
+            color: #d93025;
+
+        }
+
+
+        .shop-upload-status.loading {
+
+            display: block;
+
+            background: #f5f5f5;
+
+            color: #555;
+
+        }
+
+
+        /* =================================================
+           标题区域
+        ================================================= */
+
+        .shop-section-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .shop-section-header h2 {
+
+            margin: 0 0 6px 0;
+
+        }
+
+
+        .shop-section-header p {
+
+            margin: 0;
+
+            color: #777;
+
+        }
+
+
+        /* =================================================
+           数据预览
+        ================================================= */
+
+        .shop-metrics-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 16px;
+
+        }
+
+
+        .shop-metric {
+
+            padding: 20px;
+
+            background: #f7f8fa;
+
+            border-radius: 12px;
+
+        }
+
+
+        .shop-metric span {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #777;
+
+            font-size: 14px;
+
+        }
+
+
+        .shop-metric strong {
+
+            font-size: 24px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* =================================================
+           日期筛选区域
+        ================================================= */
+
+        .shop-filter-box {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        /* =================================================
+           日期范围按钮
+        ================================================= */
+
+        .shop-date-range-wrapper {
+
+            position: relative;
+
+        }
+
+
+        .shop-date-range-button {
+
+            height: 44px;
+
+            min-width: 300px;
+
+            padding: 0 16px;
+
+            border: 1px solid #d9d9d9;
+
+            border-radius: 9px;
+
+            background: #ffffff;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            box-sizing: border-box;
+
+            transition: all 0.15s ease;
+
+        }
+
+
+        .shop-date-range-button:hover {
+
+            border-color: #999;
+
+            background: #fafafa;
+
+        }
+
+
+        .shop-date-range-button.active {
+
+            border-color: #111;
+
+            box-shadow:
+                0 0 0 2px rgba(0, 0, 0, 0.05);
+
+        }
+
+
+        .shop-calendar-icon {
+
+            font-size: 17px;
+
+        }
+
+
+        .shop-date-range-text {
+
+            flex: 1;
+
+            text-align: left;
+
+            color: #333;
+
+        }
+
+
+        .shop-date-range-arrow {
+
+            font-size: 12px;
+
+            color: #777;
+
+        }
+
+
+        /* =================================================
+           日期选择器面板
+        ================================================= */
+
+        .shop-date-picker {
+
+            position: absolute;
+
+            top: calc(100% + 8px);
+
+            left: 0;
+
+            width: 560px;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e5e5;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.12);
+
+            z-index: 9999;
+
+            display: none;
+
+            overflow: hidden;
+
+        }
+
+
+        .shop-date-picker.open {
+
+            display: grid;
+
+            grid-template-columns:
+                125px 1fr;
+
+            grid-template-rows:
+                auto auto;
+
+        }
+
+
+        /* =================================================
+           快捷日期
+        ================================================= */
+
+        .shop-date-shortcuts {
+
+            width: auto;
+
+            padding: 14px;
+
+            border-right: 1px solid #eeeeee;
+
+            box-sizing: border-box;
+
+            grid-column: 1;
+
+            grid-row: 1;
+
+        }
+
+
+        .shop-date-shortcuts-title {
+
+            font-size: 13px;
+
+            color: #999;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .shop-date-shortcut {
+
+            display: block;
+
+            width: 100%;
+
+            padding: 9px 10px;
+
+            border: none;
+
+            background: transparent;
+
+            border-radius: 7px;
+
+            text-align: left;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+        }
+
+
+        .shop-date-shortcut:hover {
+
+            background: #f5f5f5;
+
+        }
+
+
+        /* =================================================
+           日历区域
+        ================================================= */
+
+        .shop-calendar-area {
+
+            width: auto;
+
+            min-width: 0;
+
+            padding: 16px;
+
+            box-sizing: border-box;
+
+            grid-column: 2;
+
+            grid-row: 1;
+
+        }
+
+
+        .shop-calendar-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .shop-calendar-nav {
+
+            width: 34px;
+
+            height: 34px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #f5f5f5;
+
+            cursor: pointer;
+
+            font-size: 18px;
+
+        }
+
+
+        .shop-calendar-nav:hover {
+
+            background: #eaeaea;
+
+        }
+
+
+        .shop-calendar-title {
+
+            font-weight: 600;
+
+            font-size: 15px;
+
+        }
+
+
+        .shop-calendar-weekdays {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(7, 1fr);
+
+            gap: 4px;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        .shop-calendar-weekday {
+
+            text-align: center;
+
+            font-size: 12px;
+
+            color: #999;
+
+            padding: 5px 0;
+
+        }
+
+
+        .shop-calendar-days {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(7, 1fr);
+
+            gap: 4px;
+
+        }
+
+
+        .shop-calendar-day {
+
+            height: 34px;
+
+            border: none;
+
+            background: transparent;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            position: relative;
+
+            transition:
+                background 0.08s ease,
+                color 0.08s ease;
+
+        }
+
+
+        .shop-calendar-day:hover {
+
+            background: #f1f1f1;
+
+        }
+
+
+        .shop-calendar-day.other-month {
+
+            color: #ccc;
+
+        }
+
+
+        .shop-calendar-day.today {
+
+            font-weight: 700;
+
+        }
+
+
+        .shop-calendar-day.start-date,
+
+        .shop-calendar-day.end-date {
+
+            background: #111;
+
+            color: #ffffff;
+
+        }
+
+
+        .shop-calendar-day.in-range {
+
+    background: #d6d6d6;
+
+    color: #111;
+
+    border-radius: 0;
+
+    transition:
+        background 0.08s ease,
+        color 0.08s ease;
+
+}
+
+
+/* =================================================
+   日期范围中的日期
+================================================= */
+
+.shop-calendar-day.start-date,
+.shop-calendar-day.end-date {
+
+    background: #111;
+
+    color: #ffffff;
+
+}
+
+
+/* =================================================
+   开始日期之后，鼠标预览覆盖的范围
+================================================= */
+
+.shop-calendar-day.start-date.in-range {
+
+    background: #111;
+
+    color: #ffffff;
+
+}
+
+
+/* =================================================
+   结束日期
+================================================= */
+
+.shop-calendar-day.end-date.in-range {
+
+    background: #111;
+
+    color: #ffffff;
+
+}
+
+
+/* =================================================
+   开始日期
+================================================= */
+
+.shop-calendar-day.start-date {
+
+    border-radius: 7px 0 0 7px;
+
+}
+
+
+/* =================================================
+   结束日期
+================================================= */
+
+.shop-calendar-day.end-date {
+
+    border-radius: 0 7px 7px 0;
+
+}
+
+
+/* =================================================
+   同一天
+================================================= */
+
+.shop-calendar-day.start-date.end-date {
+
+    border-radius: 7px;
+
+}
+
+
+        .shop-calendar-day.start-date {
+
+            border-radius: 7px 0 0 7px;
+
+        }
+
+
+        .shop-calendar-day.end-date {
+
+            border-radius: 0 7px 7px 0;
+
+        }
+
+
+        .shop-calendar-day.start-date.end-date {
+
+            border-radius: 7px;
+
+        }
+
+
+        /* =================================================
+           日期选择器底部
+        ================================================= */
+
+        .shop-date-picker-footer {
+
+            padding: 12px 16px;
+
+            border-top: 1px solid #eeeeee;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            box-sizing: border-box;
+
+            grid-column: 1 / 3;
+
+            grid-row: 2;
+
+        }
+
+
+        .shop-selected-range {
+
+            font-size: 13px;
+
+            color: #777;
+
+        }
+
+
+        .shop-date-picker-actions {
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+
+
+        .shop-date-cancel {
+
+            height: 36px;
+
+            padding: 0 15px;
+
+            border: 1px solid #ddd;
+
+            background: #ffffff;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+        }
+
+
+        .shop-date-confirm {
+
+            height: 36px;
+
+            padding: 0 17px;
+
+            border: none;
+
+            background: #111;
+
+            color: #ffffff;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+        }
+
+
+        /* =================================================
+           查询按钮
+        ================================================= */
+
+        .shop-query-btn {
+
+            height: 44px;
+
+            padding: 0 24px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #111;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+        }
+
+
+        .shop-query-btn:hover {
+
+            opacity: 0.85;
+
+        }
+
+
+        .shop-reset-btn {
+
+            height: 44px;
+
+            padding: 0 20px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 9px;
+
+            background: #ffffff;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+        }
+
+
+        .shop-reset-btn:hover {
+
+            background: #f5f5f5;
+
+        }
+
+
+        /* =================================================
+           经营总览
+        ================================================= */
+
+        .shop-overview-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 16px;
+
+        }
+
+
+        .shop-overview-card {
+
+            padding: 22px;
+
+            border-radius: 14px;
+
+            background: #f7f8fa;
+
+        }
+
+
+        .shop-overview-card .label {
+
+            display: block;
+
+            color: #777;
+
+            font-size: 14px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .shop-overview-card .value {
+
+            display: block;
+
+            font-size: 26px;
+
+            font-weight: 700;
+
+        }
+
+
+        .shop-overview-card .sub {
+
+            display: block;
+
+            margin-top: 8px;
+
+            color: #999;
+
+            font-size: 13px;
+
+        }
+
+        
+
+        /* =================================================
+           趋势分析
+        ================================================= */
+
+        .shop-trend-section {
+
+            overflow: hidden;
+
+        }
+
+
+        .shop-trend-block {
+
+            margin-top: 28px;
+
+            padding-top: 24px;
+
+            border-top: 1px solid #eeeeee;
+
+        }
+
+
+        .shop-trend-block:first-of-type {
+
+            margin-top: 0;
+
+            padding-top: 0;
+
+            border-top: none;
+
+        }
+
+
+        .shop-trend-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 16px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .shop-trend-header h3 {
+
+            margin: 0 0 6px 0;
+
+            font-size: 18px;
+
+        }
+
+
+        .shop-trend-header p {
+
+            margin: 0;
+
+            color: #999;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =================================================
+           图表切换按钮
+        ================================================= */
+
+        .shop-chart-tabs {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 4px;
+
+            background: #f5f5f5;
+
+            border-radius: 9px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .shop-chart-tab {
+
+            height: 34px;
+
+            padding: 0 13px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: transparent;
+
+            color: #777;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            transition: all 0.15s ease;
+
+        }
+
+
+        .shop-chart-tab:hover {
+
+            color: #111;
+
+            background: #eeeeee;
+
+        }
+
+
+        .shop-chart-tab.active {
+
+            background: #111;
+
+            color: #ffffff;
+
+        }
+
+
+        /* =================================================
+           图表容器
+        ================================================= */
+
+        .shop-chart-box {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 300px;
+
+            background: #fafafa;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+        }
+
+
+        .shop-chart-box canvas {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+        }
+
+
+        .shop-chart-empty {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: none;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: #999;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =================================================
+           环比区域
+        ================================================= */
+
+        .shop-comparison-grid {
+
+            width: 100%;
+
+        }
+
+
+        /* =================================================
+           表格
+        ================================================= */
+
+        .shop-table-wrapper {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+        }
+
+
+        .shop-data-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1000px;
+
+        }
+
+
+        .shop-data-table th {
+
+            padding: 14px 12px;
+
+            background: #f7f8fa;
+
+            text-align: left;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+
+        }
+
+
+        .shop-data-table td {
+
+            padding: 14px 12px;
+
+            border-bottom: 1px solid #eee;
+
+            white-space: nowrap;
+
+        }
+
+
+        .shop-data-table tr:hover td {
+
+            background: #fafafa;
+
+        }
+
+
+        /* =================================================
+           Loading / 空数据
+        ================================================= */
+
+        .shop-loading,
+        .shop-empty {
+
+            padding: 40px;
+
+            text-align: center;
+
+            color: #888;
+
+        }
+
+
+        /* =================================================
+           小屏幕
+        ================================================= */
+
+        @media (max-width: 1000px) {
+
+            .shop-chart-tabs {
+
+                width: 100%;
+
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .shop-date-picker {
+
+                width: 560px;
+
+                min-width: 0;
+
+            }
+
+
+            .shop-date-range-wrapper {
+
+                width: 100%;
+
+            }
+
+
+            .shop-date-range-button {
+
+                width: 100%;
+
+            }
+
+
+            .shop-main-content {
+
+                padding: 24px;
+
+            }
+
+
+            .shop-metrics-grid,
+            .shop-overview-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .shop-main-content {
+
+                margin-left: 0;
+
+                width: 100%;
+
+                padding: 20px;
+
+            }
+
+
+            .shop-metrics-grid,
+            .shop-overview-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .shop-chart-box {
+
+                height: 240px;
+
+            }
+
+
+            .shop-chart-tab {
+
+                flex: 1;
+
+                min-width: 90px;
+
+            }
+
+
+            .shop-date-picker {
+
+                width: calc(100vw - 40px);
+
+                max-width: 560px;
+
+            }
+
+        }
+/* =================================================
+   上传区域缩小为工具栏
+================================================= */
+
+.shop-drop-zone {
+
+    margin-top:12px;
+    padding:18px;
+    border:2px dashed #d9d9d9;
+    border-radius:12px;
+    text-align:center;
+    cursor:pointer;
+    background:#fafafa;
+
+}
+
+
+.shop-drop-zone.dragover {
+
+    border-color:#1677ff;
+    background:#f5f9ff;
+
+}
+
+
+.shop-drop-title {
+
+    font-size:16px;
+    font-weight:600;
+
+}
+
+
+.shop-drop-desc {
+
+    margin-top:6px;
+    font-size:13px;
+    color:#777;
+
+}
+
+
+.shop-upload-title h2 {
+
+    font-size:18px;
+
+    margin-bottom:0;
+
+}
+
+
+.shop-upload-title p {
+
+    display:none;
+
+}
+
+
+
+.shop-upload-box {
+
+    margin-top:12px;
+
+    padding:12px 16px;
+
+    border-radius:10px;
+
+}
+
+
+
+.shop-file-label {
+
+    padding:8px 18px;
+
+    font-size:14px;
+
+}
+
+
+
+.shop-upload-btn {
+
+    margin-top:10px;
+
+    padding:9px 20px;
+
+    font-size:14px;
+
+}
+
+
+
+.shop-selected-file {
+
+    margin-top:8px;
+
+}
+
+
+
+/* 上传卡片整体缩小 */
+
+.shop-card:has(.shop-upload-title) {
+
+    padding:18px;
+
+    margin-bottom:16px;
+
+}
+
+    
+
+/* =================================================
+   整个上传区域拖拽效果
+================================================= */
+
+.shop-upload-box.dragover {
+
+    border-color:#1677ff;
+    background:#f5f9ff;
+
+}
+
+
+
+
+/* =================================================
+   V4 上传预览 / 导入记录
+================================================= */
+
+.shop-upload-preview,
+.shop-upload-result,
+.shop-upload-history {
+
+    margin-top:16px;
+    padding:16px;
+    background:#f7f8fa;
+    border-radius:12px;
+    font-size:14px;
+
+}
+
+
+.shop-upload-preview h3,
+.shop-upload-result h3,
+.shop-upload-history h3 {
+
+    margin:0 0 10px 0;
+    font-size:16px;
+
+}
+
+
+.shop-upload-list-item {
+
+    padding:6px 0;
+    color:#555;
+
+}
+
+
+.shop-upload-time {
+
+    color:#888;
+    font-size:13px;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- =================================================
+         左侧导航
+    ================================================= -->
+
+    <aside class="sidebar">
+
+
+    <div class="brand">
+
+        <h2>
+            Ian OS
+        </h2>
+
+        <p>
+            TikTok运营系统
+        </p>
+
+    </div>
+
+
+    <div
+    class="menu"
+    id="menu"
+></div>
+
+
+</aside>
+
+
+
+    <!-- =================================================
+         主内容
+    ================================================= -->
+
+    <main class="shop-main-content">
+
+
+        <!-- =================================================
+             页面标题
+        ================================================= -->
+
+        <div class="shop-page-title">
+
+            <h1>
+                TikTok Shop 店铺数据
+            </h1>
+
+            <p>
+                每日经营数据 · Excel 自动导入 · 历史经营分析
+            </p>
+
+        </div>
+
+
+
+        <!-- =================================================
+             Excel 上传
+        ================================================= -->
+
+        <section class="shop-card">
+
+
+            <div class="shop-upload-title">
+
+                <h2>
+                    📤 上传店铺数据
+                </h2>
+
+                <p>
+                    上传 TikTok Shop 导出的
+                    Shop Analytics_Key metrics Excel 文件
+                </p>
+
+            </div>
+
+
+            <div id="dropZone" class="shop-upload-box">
+
+        
+
+
+                <input
+    type="file"
+    id="excelFile"
+    accept=".xlsx,.xls"
+    multiple
+>
+
+
+                <label
+                    for="excelFile"
+                    class="shop-file-label"
+                >
+
+                    📁 选择 Excel 文件
+
+                </label>
+
+
+                <div
+                    id="selectedFile"
+                    class="shop-selected-file"
+                >
+
+                    尚未选择文件
+
+                </div>
+
+
+                <button
+                    id="uploadBtn"
+                    class="shop-upload-btn"
+                    type="button"
+                >
+
+                    上传并保存数据
+
+                </button>
+
+
+            </div>
+
+
+            <div
+                id="uploadStatus"
+                class="shop-upload-status"
+            ></div>
+
+            <!-- =================================================
+                 V4 导入预览
+            ================================================= -->
+
+            <div
+                id="uploadPreview"
+                class="shop-upload-preview"
+                style="display:none;"
+            >
+
+                <h3>
+                    📂 导入预览
+                </h3>
+
+                <div id="uploadPreviewContent">
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 V4 导入结果
+            ================================================= -->
+
+            <div
+                id="uploadResult"
+                class="shop-upload-result"
+                style="display:none;"
+            >
+
+                <h3>
+                    🎉 导入结果
+                </h3>
+
+                <div id="uploadResultContent">
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 V4 最近上传记录
+            ================================================= -->
+
+            <div
+                id="uploadHistory"
+                class="shop-upload-history"
+                style="display:none;"
+            >
+
+                <h3>
+                    🕒 最近导入
+                </h3>
+
+                <div id="uploadHistoryContent">
+                </div>
+
+            </div>
+
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             Excel 数据预览
+        ================================================= -->
+
+        <section
+            id="previewSection"
+            class="shop-card"
+            style="display:none;"
+        >
+
+
+            <div class="shop-section-header">
+
+                <div>
+
+                    <h2>
+                        数据预览
+                    </h2>
+
+                    <p id="previewDate">
+                        -
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="shop-metrics-grid">
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        GMV
+                    </span>
+
+                    <strong id="previewGMV">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        订单数
+                    </span>
+
+                    <strong id="previewOrders">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        商品成交件数
+                    </span>
+
+                    <strong id="previewUnits">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        客户数
+                    </span>
+
+                    <strong id="previewCustomers">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        商品曝光
+                    </span>
+
+                    <strong id="previewImpressions">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        商品点击
+                    </span>
+
+                    <strong id="previewClicks">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        CTR
+                    </span>
+
+                    <strong id="previewCTR">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="shop-metric">
+
+                    <span>
+                        客单价
+                    </span>
+
+                    <strong id="previewAOV">
+                        -
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             日期范围查询
+        ================================================= -->
+
+        <section class="shop-card">
+
+
+            <div class="shop-section-header">
+
+                <div>
+
+                    <h2>
+                        📅 经营数据查询
+                    </h2>
+
+                    <p>
+                        选择日期范围查看店铺经营情况
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="shop-filter-box">
+
+
+                <!-- =================================================
+                     日期范围选择器
+                ================================================= -->
+
+                <div
+                    class="shop-date-range-wrapper"
+                    id="dateRangeWrapper"
+                >
+
+
+                    <button
+                        type="button"
+                        id="dateRangeButton"
+                        class="shop-date-range-button"
+                    >
+
+                        <span class="shop-calendar-icon">
+                            📅
+                        </span>
+
+
+                        <span
+                            id="dateRangeText"
+                            class="shop-date-range-text"
+                        >
+
+                            选择日期范围
+
+                        </span>
+
+
+                        <span
+                            class="shop-date-range-arrow"
+                        >
+
+                            ▼
+
+                        </span>
+
+                    </button>
+
+
+
+                    <!-- =================================================
+                         日期选择面板
+                    ================================================= -->
+
+                    <div
+                        id="datePicker"
+                        class="shop-date-picker"
+                    >
+
+
+                        <!-- =========================
+                             快捷日期
+                        ========================== -->
+
+                        <div class="shop-date-shortcuts">
+
+
+                            <div
+                                class="shop-date-shortcuts-title"
+                            >
+
+                                快捷选择
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="shop-date-shortcut"
+                                data-shortcut="today"
+                            >
+                                今天
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="shop-date-shortcut"
+                                data-shortcut="yesterday"
+                            >
+                                昨天
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="shop-date-shortcut"
+                                data-shortcut="7days"
+                            >
+                                近 7 天
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="shop-date-shortcut"
+                                data-shortcut="30days"
+                            >
+                                近 30 天
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="shop-date-shortcut"
+                                data-shortcut="thismonth"
+                            >
+                                本月
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="shop-date-shortcut"
+                                data-shortcut="lastmonth"
+                            >
+                                上月
+                            </button>
+
+
+                        </div>
+
+
+
+                        <!-- =========================
+                             日历
+                        ========================== -->
+
+                        <div class="shop-calendar-area">
+
+
+                            <div
+                                class="shop-calendar-header"
+                            >
+
+
+                                <button
+                                    type="button"
+                                    id="prevMonth"
+                                    class="shop-calendar-nav"
+                                >
+
+                                    ‹
+
+                                </button>
+
+
+                                <div
+                                    id="calendarTitle"
+                                    class="shop-calendar-title"
+                                >
+
+                                    -
+
+                                </div>
+
+
+                                <button
+                                    type="button"
+                                    id="nextMonth"
+                                    class="shop-calendar-nav"
+                                >
+
+                                    ›
+
+                                </button>
+
+
+                            </div>
+
+
+                            <div
+                                class="shop-calendar-weekdays"
+                            >
+
+                                <div class="shop-calendar-weekday">
+                                    日
+                                </div>
+
+                                <div class="shop-calendar-weekday">
+                                    一
+                                </div>
+
+                                <div class="shop-calendar-weekday">
+                                    二
+                                </div>
+
+                                <div class="shop-calendar-weekday">
+                                    三
+                                </div>
+
+                                <div class="shop-calendar-weekday">
+                                    四
+                                </div>
+
+                                <div class="shop-calendar-weekday">
+                                    五
+                                </div>
+
+                                <div class="shop-calendar-weekday">
+                                    六
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                id="calendarDays"
+                                class="shop-calendar-days"
+                            ></div>
+
+
+                        </div>
+
+
+
+                        <!-- =========================
+                             底部
+                        ========================== -->
+
+                        <div
+                            class="shop-date-picker-footer"
+                        >
+
+
+                            <div
+                                id="selectedRangeText"
+                                class="shop-selected-range"
+                            >
+
+                                尚未选择日期
+
+                            </div>
+
+
+                            <div
+                                class="shop-date-picker-actions"
+                            >
+
+                                <button
+                                    type="button"
+                                    id="dateCancel"
+                                    class="shop-date-cancel"
+                                >
+
+                                    取消
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    id="dateConfirm"
+                                    class="shop-date-confirm"
+                                >
+
+                                    确定
+
+                                </button>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     查询
+                ================================================= -->
+
+                <button
+                    id="queryBtn"
+                    class="shop-query-btn"
+                    type="button"
+                >
+
+                    查询
+
+                </button>
+
+
+                <button
+                    id="resetBtn"
+                    class="shop-reset-btn"
+                    type="button"
+                >
+
+                    显示全部
+
+                </button>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             经营总览
+        ================================================= -->
+
+        <section class="shop-card">
+
+
+            <div class="shop-section-header">
+
+                <div>
+
+                    <h2>
+                        📊 经营总览
+                    </h2>
+
+                    <p id="overviewDateText">
+                        当前全部数据
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="shop-overview-grid">
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        总 GMV
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalGMV"
+                    >
+                        $0.00
+                    </span>
+
+                    <span class="sub">
+                        所选日期范围
+                    </span>
+
+                </div>
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        总订单
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalOrders"
+                    >
+                        0
+                    </span>
+
+                    <span class="sub">
+                        所选日期范围
+                    </span>
+
+                </div>
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        总销量
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalUnits"
+                    >
+                        0
+                    </span>
+
+                    <span class="sub">
+                        商品成交件数
+                    </span>
+
+                </div>
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        总客户
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalCustomers"
+                    >
+                        0
+                    </span>
+
+                    <span class="sub">
+                        客户数
+                    </span>
+
+                </div>
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        平均客单价
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalAOV"
+                    >
+                        $0.00
+                    </span>
+
+                    <span class="sub">
+                        总 GMV ÷ 总订单
+                    </span>
+
+                </div>
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        退款金额
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalRefund"
+                    >
+                        $0.00
+                    </span>
+
+                    <span class="sub">
+                        所选日期范围
+                    </span>
+
+                </div>
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        商品曝光
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalImpressions"
+                    >
+                        0
+                    </span>
+
+                    <span class="sub">
+                        商品曝光次数
+                    </span>
+
+                </div>
+
+
+                <div class="shop-overview-card">
+
+                    <span class="label">
+                        商品点击
+                    </span>
+
+                    <span
+                        class="value"
+                        id="totalClicks"
+                    >
+                        0
+                    </span>
+
+                    <span class="sub">
+
+                        CTR：
+
+                        <span id="totalCTR">
+                            0.00%
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             趋势分析
+        ================================================= -->
+
+        <section class="shop-card shop-trend-section">
+
+
+            <div class="shop-section-header">
+
+                <div>
+
+                    <h2>
+                        📈 趋势分析
+                    </h2>
+
+                    <p>
+                        按日期查看店铺核心经营指标变化
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 销售趋势
+            ================================================= -->
+
+            <div class="shop-trend-block">
+
+
+                <div class="shop-trend-header">
+
+
+                    <div>
+
+                        <div class="shop-trend-title-row">
+
+    <h3>
+        📈 销售趋势
+    </h3>
+
+
+    <button
+        id="addEventBtn"
+        class="event-add-btn"
+    >
+        ＋ 添加事件
+    </button>
+
+    <button
+        id="manageEventBtn"
+        class="event-add-btn"
+    >
+        📋 管理事件
+    </button>
+
+</div>
+
+                        <p>
+                            查看销售核心指标变化
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="shop-chart-tabs"
+                        data-chart-group="sales"
+                    >
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab active"
+                            data-chart-group="sales"
+                            data-chart-key="gmv"
+                        >
+                            GMV
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="sales"
+                            data-chart-key="orders"
+                        >
+                            订单
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="sales"
+                            data-chart-key="units"
+                        >
+                            销量
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="sales"
+                            data-chart-key="customers"
+                        >
+                            客户
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="sales"
+                            data-chart-key="aov"
+                        >
+                            客单价
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="shop-chart-box">
+
+
+                    <canvas
+                        id="salesChart"
+                    ></canvas>
+
+                    <!-- ===============================
+运营事件弹窗
+================================ -->
+
+<div
+    id="eventModal"
+    class="event-modal"
+>
+
+
+<div class="event-box">
+    
+
+
+<h3>
+新增运营事件
+</h3>
+
+
+<label>
+日期
+</label>
+
+<div class="event-date-wrapper">
+
+    <input
+        id="eventDate"
+        type="date"
+    >
+
+</div>
+
+
+<label>
+影响
+</label>
+
+<select
+    id="eventImpact"
+>
+
+<option value="positive">
+🟢 正面
+</option>
+
+
+<option value="negative">
+🔴 负面
+</option>
+
+</select>
+
+
+
+<label>
+类型
+</label>
+
+
+<select
+    id="eventType"
+>
+
+<option>
+库存
+</option>
+
+<option>
+活动
+</option>
+
+<option>
+广告
+</option>
+
+<option>
+达人
+</option>
+
+<option>
+其他
+</option>
+
+
+</select>
+
+
+
+<label>
+事件标题
+</label>
+
+
+<input
+    id="eventTitle"
+    placeholder="例如：德训鞋白色断货"
+>
+
+
+
+<label>
+备注
+</label>
+
+
+<textarea
+    id="eventDesc"
+    placeholder="补充说明"
+></textarea>
+
+
+
+<div class="event-actions">
+
+
+<button
+    id="saveEventBtn"
+>
+保存
+</button>
+
+
+<button
+    id="closeEventBtn"
+>
+取消
+</button>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+                    <!-- ===============================
+运营事件管理弹窗
+================================ -->
+
+<div
+    id="eventManageModal"
+    class="event-modal"
+>
+
+<!-- ===============================
+确认弹窗
+================================ -->
+
+<div
+    id="confirmModal"
+    class="confirm-modal"
+>
+
+
+<div class="confirm-box">
+
+
+<h3>
+确认删除？
+</h3>
+
+
+<p id="confirmText">
+确定删除这个运营事件吗？
+</p>
+
+
+
+<div class="confirm-actions">
+
+
+<button
+    id="confirmCancelBtn"
+>
+取消
+</button>
+
+
+<button
+    id="confirmOkBtn"
+>
+删除
+</button>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+<div class="event-box">
+
+<h3>
+运营事件管理
+</h3>
+
+<input
+    id="eventSearch"
+    placeholder="搜索事件标题/备注"
+/>
+
+<select id="eventFilter">
+
+    <option value="all">
+        全部
+    </option>
+
+    <option value="positive">
+        🟢 正面
+    </option>
+
+    <option value="negative">
+        🔴 负面
+    </option>
+
+</select>
+
+<div id="eventList">
+</div>
+
+<div class="event-actions">
+
+<button
+    id="closeManageEventBtn"
+>
+关闭
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+                        id="salesChartEmpty"
+                        class="shop-chart-empty"
+                    >
+
+                        暂无销售趋势数据
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 流量趋势
+            ================================================= -->
+
+            <div class="shop-trend-block">
+
+
+                <div class="shop-trend-header">
+
+
+                    <div>
+
+                        <h3>
+                            流量趋势
+                        </h3>
+
+                        <p>
+                            查看商品曝光、点击和 CTR 变化
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="shop-chart-tabs"
+                        data-chart-group="traffic"
+                    >
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab active"
+                            data-chart-group="traffic"
+                            data-chart-key="impressions"
+                        >
+                            曝光
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="traffic"
+                            data-chart-key="clicks"
+                        >
+                            点击
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="traffic"
+                            data-chart-key="ctr"
+                        >
+                            CTR
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="shop-chart-box">
+
+
+                    <canvas
+                        id="trafficChart"
+                    ></canvas>
+
+
+                    <div
+                        id="trafficChartEmpty"
+                        class="shop-chart-empty"
+                    >
+
+                        暂无流量趋势数据
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 转化趋势
+            ================================================= -->
+
+            <div class="shop-trend-block">
+
+
+                <div class="shop-trend-header">
+
+
+                    <div>
+
+                        <h3>
+                            转化趋势
+                        </h3>
+
+                        <p>
+                            查看流量到成交的转化表现
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="shop-chart-tabs"
+                        data-chart-group="conversion"
+                    >
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab active"
+                            data-chart-group="conversion"
+                            data-chart-key="orderConversion"
+                        >
+                            订单转化率
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="conversion"
+                            data-chart-key="productConversion"
+                        >
+                            商品成交转化率
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="conversion"
+                            data-chart-key="gmvPerThousand"
+                        >
+                            GMV / 千曝光
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="conversion"
+                            data-chart-key="gmvPerClick"
+                        >
+                            GMV / 点击
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="shop-chart-box">
+
+
+                    <canvas
+                        id="conversionChart"
+                    ></canvas>
+
+
+                    <div
+                        id="conversionChartEmpty"
+                        class="shop-chart-empty"
+                    >
+
+                        暂无转化趋势数据
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 售后趋势
+            ================================================= -->
+
+            <div class="shop-trend-block">
+
+
+                <div class="shop-trend-header">
+
+
+                    <div>
+
+                        <h3>
+                            售后趋势
+                        </h3>
+
+                        <p>
+                            查看退款、取消和退货变化
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="shop-chart-tabs"
+                        data-chart-group="afterSale"
+                    >
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab active"
+                            data-chart-group="afterSale"
+                            data-chart-key="refund"
+                        >
+                            退款金额
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="afterSale"
+                            data-chart-key="refundRate"
+                        >
+                            退款率
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="afterSale"
+                            data-chart-key="cancelledReturned"
+                        >
+                            取消/退货
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="shop-chart-tab"
+                            data-chart-group="afterSale"
+                            data-chart-key="cancelledReturnedRate"
+                        >
+                            取消/退货率
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="shop-chart-box">
+
+
+                    <canvas
+                        id="afterSaleChart"
+                    ></canvas>
+
+
+                    <div
+                        id="afterSaleChartEmpty"
+                        class="shop-chart-empty"
+                    >
+
+                        暂无售后趋势数据
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+<!-- =================================================
+             每日经营明细
+        ================================================= -->
+
+        <section class="shop-card">
+
+
+            <div class="shop-section-header">
+
+                <div>
+
+                    <h2>
+                        📋 每日经营明细
+                    </h2>
+
+                    <p>
+                        按日期查看每日店铺数据
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="historyLoading"
+                class="shop-loading"
+            >
+
+                正在读取数据...
+
+            </div>
+
+
+            <div
+                id="historyEmpty"
+                class="shop-empty"
+                style="display:none;"
+            >
+
+                暂时还没有店铺数据
+
+            </div>
+
+
+            <div
+                id="historyTableWrapper"
+                class="shop-table-wrapper"
+                style="display:none;"
+            >
+
+
+                <table class="shop-data-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                日期
+                            </th>
+
+                            <th>
+                                GMV
+                            </th>
+
+                            <th>
+                                订单
+                            </th>
+
+                            <th>
+                                销量
+                            </th>
+
+                            <th>
+                                客户
+                            </th>
+
+                            <th>
+                                退款金额
+                            </th>
+
+                            <th>
+                                曝光
+                            </th>
+
+                            <th>
+                                点击
+                            </th>
+
+                            <th>
+                                CTR
+                            </th>
+
+                            <th>
+                                客单价
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="historyTableBody">
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     Supabase 官方 JS
+====================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+
+<!-- =====================================================
+     现有 Supabase 连接
+====================================================== -->
+
+<script src="supabase.js"></script>
+
+
+<!-- =====================================================
+     现有导航
+====================================================== -->
+
+<script src="nav.js"></script>
+
+
+<!-- =====================================================
+     Chart.js
+     趋势图表
+====================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+</script>
+
+
+<!-- =====================================================
+     店铺数据 JS
+====================================================== -->
+
+<script src="shop-data.js"></script>
+
+
+</body>
+
+</html>
