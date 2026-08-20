@@ -4440,7 +4440,7 @@ function bindTrendChartEvents() {
 
                         renderTrendGroup(
                             group,
-                            allShopData
+                            filteredShopData
                         );
 
                     }
