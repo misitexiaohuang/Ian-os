@@ -70,6 +70,35 @@ document.addEventListener(
 
         bindEventEvents();
 
+        // =================================
+// 管理运营事件日期框点击弹日历
+// =================================
+
+const eventManageDate =
+    document.getElementById(
+        "eventManageDate"
+    );
+
+
+if(eventManageDate){
+
+    eventManageDate.addEventListener(
+        "click",
+        function(){
+
+            if(
+                this.showPicker
+            ){
+
+                this.showPicker();
+
+            }
+
+        }
+    );
+
+}
+
         bindConfirmDeleteEvent();
 
         loadShopEvents();
@@ -6004,6 +6033,22 @@ if(eventFilter){
 }
 
 
+const eventManageDate =
+document.getElementById(
+    "eventManageDate"
+);
+
+
+if(eventManageDate){
+
+    eventManageDate.addEventListener(
+        "change",
+        renderEventManager
+    );
+
+}
+
+
 
 const saveBtn =
 document.getElementById(
@@ -6152,9 +6197,9 @@ function drawEventStar(
 ){
 
 
-    const outerRadius = 8;
+    const outerRadius = 11;
 
-    const innerRadius = 4;
+    const innerRadius = 5;
 
 
     let rotation =
@@ -6413,6 +6458,21 @@ function renderEventManager(){
         listData = listData.filter(function(item){
 
             return item.impact === filter;
+
+        });
+
+    }
+
+
+    const manageDate =
+        document.getElementById("eventManageDate")?.value || "";
+
+
+    if(manageDate){
+
+        listData = listData.filter(function(item){
+
+            return item.date === manageDate;
 
         });
 
