@@ -6,10 +6,14 @@ console.log("TC calculator loaded!");
 // =====================================================
 
 const TC_TABLE = "tc_monthly_estimates";
+const TC_DAILY_TABLE = "tc_daily_records";
 
 let tcSaveTimer = null;
 
 let tcSaveRequestId = 0;
+
+const tcFieldTimers = {};
+const tcDailyTimers = {};
 
 
 // =====================================================
@@ -400,6 +404,8 @@ function generateDays(
             );
 
 
+        row.dataset.date = `${monthValue}-${String(i).padStart(2, "0")}`;
+
         row.innerHTML = `
 
 <td>
@@ -412,6 +418,7 @@ ${month}月${i}日
 <input
 
 class="daily-money"
+data-daily-field="money"
 
 type="number"
 
@@ -427,6 +434,7 @@ placeholder="USD"
 <input
 
 class="daily-sales"
+data-daily-field="sales"
 
 type="number"
 
@@ -479,9 +487,40 @@ placeholder="件"
 // 输入变化
 // =====================================================
 
-function handleTCInput() {
+function handleTCInput(event) {
 
-    saveData();
+    const target =
+        event && event.target
+            ? event.target
+            : null;
+
+    const data = getCurrentTCData();
+
+    saveLocalData(data);
+
+    if (target && target.classList.contains("daily-money")) {
+
+        scheduleDailyFieldSave(
+            target,
+            "money"
+        );
+
+    }
+    else if (target && target.classList.contains("daily-sales")) {
+
+        scheduleDailyFieldSave(
+            target,
+            "sales"
+        );
+
+    }
+    else if (target && target.id) {
+
+        scheduleMonthlyFieldSave(
+            target.id
+        );
+
+    }
 
     calculateMoneyTotal();
 
@@ -547,6 +586,11 @@ function fillDailyMoney() {
             input.value =
                 money;
 
+            scheduleDailyFieldSave(
+                input,
+                "money"
+            );
+
         });
 
 
@@ -556,7 +600,9 @@ function fillDailyMoney() {
 
     calculateTC();
 
-    saveData();
+    saveLocalData(
+        getCurrentTCData()
+    );
 
 }
 
@@ -1027,138 +1073,78 @@ function calculateTC() {
 // 创建数据库保存数据
 // =====================================================
 
-function buildDatabasePayload(data) {
+const TC_FIELD_MAP = {
 
-    return {
+    "exchange-rate": "exchange_rate",
+    "default-money": "default_money",
+    "product-cost": "product_cost",
+    "ads-cost": "ads_cost",
+    "warehouse-cost": "warehouse_cost",
+    "shipping-cost": "shipping_cost",
+    "sample-cost": "sample_cost",
+    "other-cost": "other_cost",
+    "social-security-cost": "social_security_cost",
+    "deduction-cost": "deduction_cost"
 
-        month:
-            data.month,
+};
 
-        exchange_rate:
-            Number(data.exchangeRate || 0),
 
-        default_money:
-            Number(data.defaultMoney || 0),
+function getMonthlyFieldValue(fieldId) {
 
-        product_cost:
-            Number(data.productCost || 0),
+    const value = getInputValue(fieldId);
+    const number = Number(value);
 
-        ads_cost:
-            Number(data.adsCost || 0),
-
-        warehouse_cost:
-            Number(data.warehouseCost || 0),
-
-        shipping_cost:
-            Number(data.shippingCost || 0),
-
-        sample_cost:
-            Number(data.sampleCost || 0),
-
-        other_cost:
-            Number(data.otherCost || 0),
-
-        social_security_cost:
-            Number(
-                data.socialSecurityCost || 0
-            ),
-
-        deduction_cost:
-            Number(
-                data.deductionCost || 0
-            ),
-
-        daily_money:
-            data.dailyMoney || [],
-
-        daily_sales:
-            data.dailySales || []
-
-    };
+    return Number.isFinite(number)
+        ? number
+        : 0;
 
 }
 
 
-// =====================================================
-// 保存到 Supabase
-// =====================================================
+async function saveTCMonthlyField(fieldId) {
 
-async function saveTCToSupabase(data) {
+    const client = getTCClient();
+    const month = getInputValue("month");
+    const column = TC_FIELD_MAP[fieldId];
 
-    const client =
-        getTCClient();
-
-
-    if (!client) {
-
-        console.warn(
-            "Supabase 客户端不存在，已仅保存到本地缓存。"
-        );
-
+    if (!client || !month || !column) {
         return;
-
     }
 
+    const payload = {
+        month: month
+    };
 
-    if (!data.month) {
-
-        return;
-
-    }
-
-
-    const payload =
-        buildDatabasePayload(
-            data
-        );
-
-
-    const requestId =
-        ++tcSaveRequestId;
-
+    payload[column] =
+        getMonthlyFieldValue(fieldId);
 
     try {
 
-        const {
-            error
-        } =
+        const { error } =
             await client
-                .from(
-                    TC_TABLE
-                )
+                .from(TC_TABLE)
                 .upsert(
                     payload,
                     {
-                        onConflict:
-                            "month"
+                        onConflict: "month"
                     }
                 );
 
-
-        if (requestId !== tcSaveRequestId) {
-
-            return;
-
-        }
-
-
         if (error) {
-
             throw error;
-
         }
-
 
         console.log(
-            "TC 数据已保存到 Supabase：",
-            data.month
+            "TC 月度字段已保存：",
+            month,
+            column
         );
 
     }
     catch (error) {
 
         console.error(
-            "TC 数据保存到 Supabase 失败：",
+            "TC 月度字段保存失败：",
             error
         );
 
@@ -1167,56 +1153,122 @@ async function saveTCToSupabase(data) {
 }
 
 
-// =====================================================
-// 防抖保存
-// =====================================================
+async function saveTCDailyField(input, field) {
 
-function scheduleSupabaseSave() {
+    const client = getTCClient();
+    const month = getInputValue("month");
+    const row = input ? input.closest("tr") : null;
+    const date = row ? row.dataset.date : "";
 
-    if (tcSaveTimer) {
+    if (!client || !month || !date) {
+        return;
+    }
 
-        clearTimeout(
-            tcSaveTimer
+    const payload = {
+        month: month,
+        record_date: date
+    };
+
+    const column =
+        field === "money"
+            ? "money"
+            : "sales";
+
+    payload[column] =
+        input.value === ""
+            ? null
+            : Number(input.value);
+
+    try {
+
+        const { error } =
+            await client
+                .from(TC_DAILY_TABLE)
+                .upsert(
+                    payload,
+                    {
+                        onConflict: "month,record_date"
+                    }
+                );
+
+        if (error) {
+            throw error;
+        }
+
+        console.log(
+            "TC 每日字段已保存：",
+            date,
+            column
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "TC 每日字段保存失败：",
+            error
         );
 
     }
 
-
-    tcSaveTimer =
-        setTimeout(
-            function() {
-
-                const data =
-                    getCurrentTCData();
+}
 
 
-                saveTCToSupabase(
-                    data
-                );
+function scheduleMonthlyFieldSave(fieldId) {
 
-            },
-            500
+    if (!TC_FIELD_MAP[fieldId]) {
+        return;
+    }
+
+    if (tcFieldTimers[fieldId]) {
+        clearTimeout(
+            tcFieldTimers[fieldId]
         );
+    }
+
+    tcFieldTimers[fieldId] =
+        setTimeout(function() {
+
+            saveTCMonthlyField(
+                fieldId
+            );
+
+        }, 500);
 
 }
 
 
-// =====================================================
-// 保存数据
-// =====================================================
+function scheduleDailyFieldSave(input, field) {
 
-function saveData() {
+    if (!input) {
+        return;
+    }
 
-    const data =
-        getCurrentTCData();
+    const row = input.closest("tr");
+    const date = row ? row.dataset.date : "";
 
+    if (!date) {
+        return;
+    }
 
-    saveLocalData(
-        data
-    );
+    const key =
+        date + "_" + field;
 
+    if (tcDailyTimers[key]) {
+        clearTimeout(
+            tcDailyTimers[key]
+        );
+    }
 
-    scheduleSupabaseSave();
+    tcDailyTimers[key] =
+        setTimeout(function() {
+
+            saveTCDailyField(
+                input,
+                field
+            );
+
+        }, 500);
 
 }
 
@@ -1225,112 +1277,68 @@ function saveData() {
 // 从 Supabase 读取指定月份
 // =====================================================
 
-async function loadMonthData(
-    month
-) {
+async function loadMonthData(month) {
 
     if (!month) {
-
         return;
-
     }
 
-
-    const client =
-        getTCClient();
-
+    const client = getTCClient();
 
     if (!client) {
-
         return;
-
     }
-
 
     try {
 
-        const {
-            data,
-            error
-        } =
+        const monthlyResult =
             await client
-                .from(
-                    TC_TABLE
-                )
+                .from(TC_TABLE)
                 .select("*")
-                .eq(
-                    "month",
-                    month
-                )
+                .eq("month", month)
                 .maybeSingle();
 
-
-        if (error) {
-
-            throw error;
-
+        if (monthlyResult.error) {
+            throw monthlyResult.error;
         }
 
+        const dailyResult =
+            await client
+                .from(TC_DAILY_TABLE)
+                .select("record_date,money,sales")
+                .eq("month", month)
+                .order("record_date", { ascending: true });
 
-        if (data) {
-
-            applyDatabaseData(
-                data
-            );
-
-            saveLocalData(
-                getCurrentTCData()
-            );
-
-            calculateMoneyTotal();
-
-            calculateSalesForecast();
-
-            calculateTC();
-
-            console.log(
-                "TC 数据已从 Supabase 恢复：",
-                month
-            );
-
-            return;
-
+        if (dailyResult.error) {
+            throw dailyResult.error;
         }
-
-
-        const localData =
-            loadLocalData();
-
-
-        if (
-            localData &&
-            localData.month === month
-        ) {
-
-            applyLocalData(
-                localData
-            );
-
-            calculateMoneyTotal();
-
-            calculateSalesForecast();
-
-            calculateTC();
-
-            scheduleSupabaseSave();
-
-            return;
-
-        }
-
 
         clearCurrentMonthData();
 
+        if (monthlyResult.data) {
+            applyDatabaseData(
+                monthlyResult.data
+            );
+        }
+
+        applyDailyDatabaseRecords(
+            dailyResult.data || []
+        );
+
+        saveLocalData(
+            getCurrentTCData()
+        );
+
         calculateMoneyTotal();
-
         calculateSalesForecast();
-
         calculateTC();
+
+        console.log(
+            "TC 数据已从 Supabase 恢复：",
+            month
+        );
+
+        return;
 
     }
     catch (error) {
@@ -1340,10 +1348,8 @@ async function loadMonthData(
             error
         );
 
-
         const localData =
             loadLocalData();
-
 
         if (
             localData &&
@@ -1355,14 +1361,63 @@ async function loadMonthData(
             );
 
             calculateMoneyTotal();
-
             calculateSalesForecast();
-
             calculateTC();
 
         }
 
     }
+
+}
+
+
+function applyDailyDatabaseRecords(records) {
+
+    if (!Array.isArray(records)) {
+        return;
+    }
+
+    const moneyInputs =
+        document.querySelectorAll(
+            ".daily-money"
+        );
+
+    const salesInputs =
+        document.querySelectorAll(
+            ".daily-sales"
+        );
+
+    const recordMap = {};
+
+    records.forEach(function(record) {
+        recordMap[record.record_date] = record;
+    });
+
+    moneyInputs.forEach(function(input) {
+
+        const row = input.closest("tr");
+        const date = row ? row.dataset.date : "";
+        const record = recordMap[date];
+
+        input.value =
+            record && record.money !== null && record.money !== undefined
+                ? record.money
+                : "";
+
+    });
+
+    salesInputs.forEach(function(input) {
+
+        const row = input.closest("tr");
+        const date = row ? row.dataset.date : "";
+        const record = recordMap[date];
+
+        input.value =
+            record && record.sales !== null && record.sales !== undefined
+                ? record.sales
+                : "";
+
+    });
 
 }
 
@@ -1441,10 +1496,6 @@ function applyDatabaseData(
     );
 
 
-    applyDailyValues(
-        data.daily_money,
-        data.daily_sales
-    );
 
 }
 
