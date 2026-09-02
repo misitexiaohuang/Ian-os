@@ -8,6 +8,13 @@ console.log("TC calculator loaded!");
 const TC_TABLE = "tc_monthly_estimates";
 const TC_DAILY_TABLE = "tc_daily_records";
 
+// 本地开发环境只允许读取生产数据，禁止写入 Supabase。
+// 这样用 VS Code Live Server 测试时，不会再覆盖线上数据。
+const TC_LOCAL_READ_ONLY =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.protocol === "file:";
+
 let tcSaveTimer = null;
 
 let tcSaveRequestId = 0;
@@ -1103,11 +1110,26 @@ function getMonthlyFieldValue(fieldId) {
 
 async function saveTCMonthlyField(fieldId) {
 
-    const client = getTCClient();
     const month = getInputValue("month");
     const column = TC_FIELD_MAP[fieldId];
 
-    if (!client || !month || !column) {
+    if (!month || !column) {
+        return;
+    }
+
+    // Live Server / 本地文件只做本地缓存，不允许写入生产 Supabase。
+    if (TC_LOCAL_READ_ONLY) {
+        console.log(
+            "TC 本地开发模式：已阻止 Supabase 月度数据写入：",
+            month,
+            column
+        );
+        return;
+    }
+
+    const client = getTCClient();
+
+    if (!client) {
         return;
     }
 
@@ -1155,12 +1177,27 @@ async function saveTCMonthlyField(fieldId) {
 
 async function saveTCDailyField(input, field) {
 
-    const client = getTCClient();
     const month = getInputValue("month");
     const row = input ? input.closest("tr") : null;
     const date = row ? row.dataset.date : "";
 
-    if (!client || !month || !date) {
+    if (!month || !date) {
+        return;
+    }
+
+    // Live Server / 本地文件只做本地缓存，不允许写入生产 Supabase。
+    if (TC_LOCAL_READ_ONLY) {
+        console.log(
+            "TC 本地开发模式：已阻止 Supabase 每日数据写入：",
+            date,
+            field
+        );
+        return;
+    }
+
+    const client = getTCClient();
+
+    if (!client) {
         return;
     }
 
@@ -1321,9 +1358,42 @@ async function loadMonthData(month) {
             );
         }
 
-        applyDailyDatabaseRecords(
-            dailyResult.data || []
-        );
+        const dailyRecords =
+            Array.isArray(dailyResult.data)
+                ? dailyResult.data
+                : [];
+
+        // 正常情况下优先使用新的 tc_daily_records。
+        // 如果新表完全没有有效的每日数据，则回退到旧表中的
+        // daily_money / daily_sales，避免历史数据再次“消失”。
+        const hasDailyMoney =
+            dailyRecords.some(function(record) {
+                return record.money !== null &&
+                    record.money !== undefined;
+            });
+
+        const hasDailySales =
+            dailyRecords.some(function(record) {
+                return record.sales !== null &&
+                    record.sales !== undefined;
+            });
+
+        if (hasDailyMoney || hasDailySales) {
+            applyDailyDatabaseRecords(
+                dailyRecords
+            );
+        }
+        else if (monthlyResult.data) {
+            applyDailyValues(
+                monthlyResult.data.daily_money,
+                monthlyResult.data.daily_sales
+            );
+
+            console.warn(
+                "TC 每日新表暂无有效数据，已使用旧表 daily_money / daily_sales 作为安全回退：",
+                month
+            );
+        }
 
         saveLocalData(
             getCurrentTCData()
@@ -1356,6 +1426,7 @@ async function loadMonthData(month) {
             localData.month === month
         ) {
 
+            // 数据库读取失败时，最后再使用浏览器本地缓存。
             applyLocalData(
                 localData
             );
@@ -1720,6 +1791,12 @@ async function loadData() {
 document.addEventListener(
     "DOMContentLoaded",
     async function() {
+
+        if (TC_LOCAL_READ_ONLY) {
+            console.warn(
+                "TC：当前为本地开发模式，仅允许读取/测试，不会写入线上 Supabase 数据。"
+            );
+        }
 
         const monthInput =
             document.getElementById(
