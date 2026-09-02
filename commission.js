@@ -18,11 +18,24 @@ let tcSaveRequestId = 0;
 
 function getTCClient() {
 
-    if (typeof getSupabaseClient === "function") {
+    if (window.supabaseClient) {
 
-        return getSupabaseClient();
+        return window.supabaseClient;
 
     }
+
+    if (
+        window.supabase &&
+        typeof window.supabase.from === "function"
+    ) {
+
+        return window.supabase;
+
+    }
+
+    console.error(
+        "TC 页面：Supabase Client 不存在"
+    );
 
     return null;
 
