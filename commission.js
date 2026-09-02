@@ -1,123 +1,393 @@
 console.log("TC calculator loaded!");
 
 
-// =======================
-// 月份变化
-// =======================
+// =====================================================
+// Supabase / 数据状态
+// =====================================================
+
+const TC_TABLE = "tc_monthly_estimates";
+
+let tcSaveTimer = null;
+
+let tcSaveRequestId = 0;
 
 
-document.addEventListener(
-"DOMContentLoaded",
-function(){
+// =====================================================
+// 工具函数
+// =====================================================
 
+function getTCClient() {
 
-let monthInput =
-document.getElementById(
-"month"
-);
+    if (typeof getSupabaseClient === "function") {
 
+        return getSupabaseClient();
 
+    }
 
-if(monthInput){
-
-
-monthInput.addEventListener(
-"change",
-function(){
-
-
-generateDays();
-
-
-saveData();
-
-
-});
-
+    return null;
 
 }
 
 
+function safeJsonParse(value) {
 
-});
+    try {
+
+        return JSON.parse(value);
+
+    }
+    catch (error) {
+
+        console.warn(
+            "TC JSON 数据解析失败：",
+            error
+        );
+
+        return null;
+
+    }
+
+}
 
 
+function getInputValue(id) {
+
+    const input =
+        document.getElementById(id);
+
+    return input
+        ? input.value
+        : "";
+
+}
 
 
-// =======================
+function setInputValue(id, value) {
+
+    const input =
+        document.getElementById(id);
+
+    if (!input) {
+
+        return;
+
+    }
+
+    input.value =
+        value === null ||
+        value === undefined
+            ? ""
+            : value;
+
+}
+
+
+function getNumberValue(id) {
+
+    const value =
+        getInputValue(id);
+
+    const number =
+        Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : 0;
+
+}
+
+
+function getDailyMoneyValues() {
+
+    return Array.from(
+        document.querySelectorAll(
+            ".daily-money"
+        )
+    ).map(function(input) {
+
+        return input.value;
+
+    });
+
+}
+
+
+function getDailySalesValues() {
+
+    return Array.from(
+        document.querySelectorAll(
+            ".daily-sales"
+        )
+    ).map(function(input) {
+
+        return input.value;
+
+    });
+
+}
+
+
+function applyDailyValues(
+    dailyMoney,
+    dailySales
+) {
+
+    const moneyValues =
+        Array.isArray(dailyMoney)
+            ? dailyMoney
+            : [];
+
+    const salesValues =
+        Array.isArray(dailySales)
+            ? dailySales
+            : [];
+
+
+    document
+        .querySelectorAll(
+            ".daily-money"
+        )
+        .forEach(function(input, index) {
+
+            input.value =
+                moneyValues[index] || "";
+
+        });
+
+
+    document
+        .querySelectorAll(
+            ".daily-sales"
+        )
+        .forEach(function(input, index) {
+
+            input.value =
+                salesValues[index] || "";
+
+        });
+
+}
+
+
+function getCurrentTCData() {
+
+    return {
+
+        month:
+            getInputValue(
+                "month"
+            ),
+
+        exchangeRate:
+            getInputValue(
+                "exchange-rate"
+            ),
+
+        defaultMoney:
+            getInputValue(
+                "default-money"
+            ),
+
+        productCost:
+            getInputValue(
+                "product-cost"
+            ),
+
+        adsCost:
+            getInputValue(
+                "ads-cost"
+            ),
+
+        warehouseCost:
+            getInputValue(
+                "warehouse-cost"
+            ),
+
+        shippingCost:
+            getInputValue(
+                "shipping-cost"
+            ),
+
+        sampleCost:
+            getInputValue(
+                "sample-cost"
+            ),
+
+        otherCost:
+            getInputValue(
+                "other-cost"
+            ),
+
+        socialSecurityCost:
+            getInputValue(
+                "social-security-cost"
+            ),
+
+        deductionCost:
+            getInputValue(
+                "deduction-cost"
+            ),
+
+        dailyMoney:
+            getDailyMoneyValues(),
+
+        dailySales:
+            getDailySalesValues()
+
+    };
+
+}
+
+
+// =====================================================
+// 本地缓存
+// =====================================================
+
+function saveLocalData(data) {
+
+    try {
+
+        localStorage.setItem(
+            "TC_Data",
+            JSON.stringify(data)
+        );
+
+    }
+    catch (error) {
+
+        console.warn(
+            "TC 本地缓存保存失败：",
+            error
+        );
+
+    }
+
+}
+
+
+function loadLocalData() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                "TC_Data"
+            );
+
+        if (!saved) {
+
+            return null;
+
+        }
+
+        return safeJsonParse(
+            saved
+        );
+
+    }
+    catch (error) {
+
+        console.warn(
+            "TC 本地缓存读取失败：",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+// =====================================================
 // 生成每日表格
-// =======================
+// =====================================================
+
+function generateDays(
+    dailyMoney,
+    dailySales
+) {
+
+    const monthValue =
+        document.getElementById(
+            "month"
+        )?.value;
 
 
-function generateDays(){
+    if (!monthValue) {
+
+        const container =
+            document.getElementById(
+                "daily-container"
+            );
+
+        if (container) {
+
+            container.innerHTML = "";
+
+        }
+
+        return;
+
+    }
 
 
-let monthValue =
-document.getElementById("month").value;
+    const parts =
+        monthValue.split("-");
 
 
+    if (parts.length !== 2) {
 
-if(!monthValue){
+        return;
 
-return;
-
-}
-
+    }
 
 
-
-let [year,month] =
-monthValue.split("-");
-
+    const year =
+        Number(parts[0]);
 
 
-
-let days =
-new Date(
-year,
-month,
-0
-).getDate();
+    const month =
+        Number(parts[1]);
 
 
+    const days =
+        new Date(
+            year,
+            month,
+            0
+        ).getDate();
 
 
-
-let container =
-document.getElementById(
-"daily-container"
-);
-
+    const container =
+        document.getElementById(
+            "daily-container"
+        );
 
 
-if(!container){
+    if (!container) {
 
-return;
+        return;
 
-}
-
-
-
-container.innerHTML="";
+    }
 
 
+    container.innerHTML = "";
 
 
-for(
-let i=1;
-i<=days;
-i++
-){
+    for (
+        let i = 1;
+        i <= days;
+        i++
+    ) {
+
+        const row =
+            document.createElement(
+                "tr"
+            );
 
 
-
-let row =
-document.createElement("tr");
-
-
-
-row.innerHTML = `
-
+        row.innerHTML = `
 
 <td>
 ${month}月${i}日
@@ -153,267 +423,181 @@ placeholder="件"
 
 </td>
 
-
 `;
 
 
-
-container.appendChild(row);
-
-
-
+        container.appendChild(
+            row
+        );
 
 
-row
-.querySelectorAll("input")
-.forEach(function(input){
+        row
+            .querySelectorAll(
+                "input"
+            )
+            .forEach(function(input) {
+
+                input.addEventListener(
+                    "input",
+                    handleTCInput
+                );
+
+            });
+
+    }
 
 
-
-input.addEventListener(
-"input",
-function(){
-
-
-saveData();
+    applyDailyValues(
+        dailyMoney,
+        dailySales
+    );
 
 
-calculateMoneyTotal();
+    calculateMoneyTotal();
 
+    calculateSalesForecast();
 
-calculateSalesForecast();
-
-
-calculateTC();
-
-
-
-});
-
-
-});
-
-
+    calculateTC();
 
 }
 
 
+// =====================================================
+// 输入变化
+// =====================================================
 
+function handleTCInput() {
 
+    saveData();
 
+    calculateMoneyTotal();
 
-// 恢复每日数据
+    calculateSalesForecast();
 
-
-let saved =
-localStorage.getItem(
-"TC_Data"
-);
-
-
-
-if(saved){
-
-
-
-let data =
-JSON.parse(saved);
-
-
-
-
-
-if(data.dailyMoney){
-
-
-
-document
-.querySelectorAll(
-".daily-money"
-)
-.forEach(function(input,index){
-
-
-
-input.value =
-data.dailyMoney[index] || "";
-
-
-
-});
-
+    calculateTC();
 
 }
 
 
+// =====================================================
+// 月份变化
+// =====================================================
+
+async function handleMonthChange() {
+
+    const monthInput =
+        document.getElementById(
+            "month"
+        );
 
 
+    if (!monthInput) {
+
+        return;
+
+    }
 
 
-
-if(data.dailySales){
-
-
-
-document
-.querySelectorAll(
-".daily-sales"
-)
-.forEach(function(input,index){
+    generateDays(
+        [],
+        []
+    );
 
 
-
-input.value =
-data.dailySales[index] || "";
-
-
-});
-
-
-
-}
-
-
-
-}
-
-
-
-
-calculateMoneyTotal();
-
-
-calculateSalesForecast();
-
-
+    await loadMonthData(
+        monthInput.value
+    );
 
 }
 
 
-
-
-
-
-
-// =======================
+// =====================================================
 // 自动填充
-// =======================
+// =====================================================
+
+function fillDailyMoney() {
+
+    const money =
+        document
+            .getElementById(
+                "default-money"
+            )
+            ?.value || "";
 
 
-function fillDailyMoney(){
+    document
+        .querySelectorAll(
+            ".daily-money"
+        )
+        .forEach(function(input) {
+
+            input.value =
+                money;
+
+        });
 
 
+    calculateMoneyTotal();
 
-let money =
-document
-.getElementById(
-"default-money"
-)
-.value;
+    calculateSalesForecast();
 
+    calculateTC();
 
-
-
-
-document
-.querySelectorAll(
-".daily-money"
-)
-.forEach(function(input){
-
-
-
-input.value =
-money;
-
-
-
-});
-
-
-
-
-calculateMoneyTotal();
-
-
-saveData();
-
-
+    saveData();
 
 }
 
 
-
-
-
-
-// =======================
+// =====================================================
 // 月结算金额
-// =======================
+// =====================================================
+
+function calculateMoneyTotal() {
+
+    let total = 0;
 
 
-function calculateMoneyTotal(){
+    document
+        .querySelectorAll(
+            ".daily-money"
+        )
+        .forEach(function(input) {
+
+            total += Number(
+                input.value || 0
+            );
+
+        });
 
 
-
-let total=0;
-
-
-
-
-document
-.querySelectorAll(
-".daily-money"
-)
-.forEach(function(input){
+    const rate =
+        Number(
+            document
+                .getElementById(
+                    "exchange-rate"
+                )
+                ?.value || 0
+        );
 
 
-
-total += Number(
-input.value || 0
-);
+    const rmb =
+        total * rate;
 
 
-
-});
-
-
-
-
-
-let rate =
-Number(
-document
-.getElementById(
-"exchange-rate"
-)
-?.value || 0
-);
+    const result =
+        document.getElementById(
+            "money-result"
+        );
 
 
+    if (!result) {
+
+        return;
+
+    }
 
 
-let rmb =
-total * rate;
-
-
-
-
-
-let result =
-document.getElementById(
-"money-result"
-);
-
-
-
-
-
-if(result){
-
-
-
-result.innerHTML =
+    result.innerHTML =
 
 `
 <div class="compact-result">
@@ -440,125 +624,81 @@ $${total.toFixed(2)}
 
 `;
 
-
-
 }
 
 
-
-}
-
-// =======================
+// =====================================================
 // 销量预测
-// =======================
+// =====================================================
 
+function calculateSalesForecast() {
 
-function calculateSalesForecast(){
+    let total = 0;
 
+    let filled = 0;
 
-let total=0;
 
+    const inputs =
+        document.querySelectorAll(
+            ".daily-sales"
+        );
 
-let filled=0;
 
+    inputs.forEach(function(input) {
 
+        if (input.value !== "") {
 
-let inputs =
-document
-.querySelectorAll(
-".daily-sales"
-);
+            total += Number(
+                input.value
+            );
 
+            filled++;
 
+        }
 
+    });
 
-inputs.forEach(function(input){
 
+    const result =
+        document.getElementById(
+            "sales-result"
+        );
 
 
-if(input.value){
+    if (!result) {
 
+        return;
 
-total += Number(
-input.value
-);
+    }
 
 
-filled++;
+    if (filled === 0) {
 
+        result.innerHTML =
+            "等待输入销量";
 
-}
+        return;
 
+    }
 
-});
 
+    const avg =
+        total / filled;
 
 
+    const remaining =
+        inputs.length - filled;
 
 
-let result =
-document.getElementById(
-"sales-result"
-);
+    const forecast =
+        avg * remaining;
 
 
+    const totalForecast =
+        total + forecast;
 
 
-
-if(!result){
-
-return;
-
-}
-
-
-
-
-
-
-if(filled===0){
-
-
-result.innerHTML =
-"等待输入销量";
-
-
-return;
-
-
-}
-
-
-
-
-
-
-
-let avg =
-total / filled;
-
-
-
-
-let remaining =
-inputs.length-filled;
-
-
-
-let forecast =
-avg * remaining;
-
-
-
-let totalForecast =
-total + forecast;
-
-
-
-
-
-result.innerHTML =
-
+    result.innerHTML =
 
 `
 <div class="compact-result">
@@ -594,332 +734,194 @@ ${totalForecast.toFixed(0)} 件
 
 `;
 
-
-
 }
 
 
-
-
-
-
-
-
-
-// =======================
+// =====================================================
 // TC计算
-// =======================
+// =====================================================
 
+function calculateTC() {
 
-function calculateTC(){
+    let revenue = 0;
 
 
+    const moneyResult =
+        document.getElementById(
+            "money-result"
+        );
 
-let revenue=0;
 
+    if (moneyResult) {
 
+        const match =
+            moneyResult.innerText.match(
+                /¥([\d.]+)/
+            );
 
-let moneyResult =
-document.getElementById(
-"money-result"
-);
 
+        if (match) {
 
+            revenue =
+                Number(match[1]);
 
+        }
 
+    }
 
-if(moneyResult){
 
+    let sales = 0;
 
 
-let match =
-moneyResult.innerText.match(
-/¥([\d.]+)/
-);
+    const salesResult =
+        document.getElementById(
+            "sales-result"
+        );
 
 
+    if (salesResult) {
 
-if(match){
+        const match =
+            salesResult.innerText.match(
+                /预计月销量：\s*([\d.]+)/
+            );
 
 
-revenue =
-Number(match[1]);
+        if (match) {
 
+            sales =
+                Number(match[1]);
 
-}
+        }
 
+    }
 
-}
 
+    const productCost =
+        getNumberValue(
+            "product-cost"
+        );
 
 
+    const goodsCost =
+        sales *
+        productCost;
 
 
+    const adsUSD =
+        getNumberValue(
+            "ads-cost"
+        );
 
-let sales=0;
 
+    const rate =
+        getNumberValue(
+            "exchange-rate"
+        );
 
 
-let salesResult =
-document.getElementById(
-"sales-result"
-);
+    const adsRMB =
+        adsUSD *
+        rate;
 
 
+    const warehouse =
+        getNumberValue(
+            "warehouse-cost"
+        );
 
 
+    const shipping =
+        getNumberValue(
+            "shipping-cost"
+        );
 
-if(salesResult){
 
+    const sample =
+        getNumberValue(
+            "sample-cost"
+        );
 
 
-let match =
-salesResult.innerText.match(
-/预计月销量：\s*([\d.]+)/
-);
+    const other =
+        getNumberValue(
+            "other-cost"
+        );
 
 
+    const socialSecurity =
+        getNumberValue(
+            "social-security-cost"
+        );
 
 
-if(match){
+    const deduction =
+        getNumberValue(
+            "deduction-cost"
+        );
 
 
-sales =
-Number(match[1]);
+    const totalCost =
 
+        goodsCost
 
-}
+        +
 
+        adsRMB
 
+        +
 
-}
+        warehouse
 
+        +
 
+        shipping
 
+        +
 
+        sample
 
+        +
 
+        other
 
+        +
 
-let productCost =
-Number(
-document
-.getElementById(
-"product-cost"
-)
-?.value || 0
-);
+        socialSecurity
 
+        +
 
+        deduction;
 
-let goodsCost =
-sales *
-productCost;
 
+    const profit =
 
+        revenue -
 
+        totalCost;
 
 
+    const tc =
 
+        profit *
 
+        0.05;
 
-let adsUSD =
-Number(
-document
-.getElementById(
-"ads-cost"
-)
-?.value || 0
-);
 
+    const result =
+        document.getElementById(
+            "commission-result"
+        );
 
 
+    if (!result) {
 
+        return;
 
+    }
 
-let rate =
-Number(
-document
-.getElementById(
-"exchange-rate"
-)
-?.value || 0
-);
 
-
-
-
-
-let adsRMB =
-adsUSD *
-rate;
-
-
-
-
-
-
-let warehouse =
-Number(
-document
-.getElementById(
-"warehouse-cost"
-)
-?.value || 0
-);
-
-
-
-
-
-
-let shipping =
-Number(
-document
-.getElementById(
-"shipping-cost"
-)
-?.value || 0
-);
-
-
-
-
-
-
-let sample =
-Number(
-document
-.getElementById(
-"sample-cost"
-)
-?.value || 0
-);
-
-
-
-
-
-
-let other =
-Number(
-document
-.getElementById(
-"other-cost"
-)
-?.value || 0
-);
-
-
-
-
-
-
-let socialSecurity =
-Number(
-document
-.getElementById(
-"social-security-cost"
-)
-?.value || 0
-);
-
-
-
-
-
-
-let deduction =
-Number(
-document
-.getElementById(
-"deduction-cost"
-)
-?.value || 0
-);
-
-
-
-
-
-
-
-let totalCost =
-
-
-goodsCost
-
-+
-
-adsRMB
-
-+
-
-warehouse
-
-+
-
-shipping
-
-+
-
-sample
-
-+
-
-other
-
-+
-
-socialSecurity
-
-+
-
-deduction;
-
-
-
-
-
-
-let profit =
-
-revenue -
-
-totalCost;
-
-
-
-
-
-
-let tc =
-
-profit *
-
-0.05;
-
-
-
-
-
-
-let result =
-document.getElementById(
-"commission-result"
-);
-
-
-
-
-
-
-if(result){
-
-
-
-result.innerHTML =
-
+    result.innerHTML =
 
 `
 <div class="compact-result">
@@ -1005,372 +1007,738 @@ result.innerHTML =
 
 `;
 
+}
 
+
+// =====================================================
+// 创建数据库保存数据
+// =====================================================
+
+function buildDatabasePayload(data) {
+
+    return {
+
+        month:
+            data.month,
+
+        exchange_rate:
+            Number(data.exchangeRate || 0),
+
+        default_money:
+            Number(data.defaultMoney || 0),
+
+        product_cost:
+            Number(data.productCost || 0),
+
+        ads_cost:
+            Number(data.adsCost || 0),
+
+        warehouse_cost:
+            Number(data.warehouseCost || 0),
+
+        shipping_cost:
+            Number(data.shippingCost || 0),
+
+        sample_cost:
+            Number(data.sampleCost || 0),
+
+        other_cost:
+            Number(data.otherCost || 0),
+
+        social_security_cost:
+            Number(
+                data.socialSecurityCost || 0
+            ),
+
+        deduction_cost:
+            Number(
+                data.deductionCost || 0
+            ),
+
+        daily_money:
+            data.dailyMoney || [],
+
+        daily_sales:
+            data.dailySales || []
+
+    };
 
 }
 
 
+// =====================================================
+// 保存到 Supabase
+// =====================================================
+
+async function saveTCToSupabase(data) {
+
+    const client =
+        getTCClient();
+
+
+    if (!client) {
+
+        console.warn(
+            "Supabase 客户端不存在，已仅保存到本地缓存。"
+        );
+
+        return;
+
+    }
+
+
+    if (!data.month) {
+
+        return;
+
+    }
+
+
+    const payload =
+        buildDatabasePayload(
+            data
+        );
+
+
+    const requestId =
+        ++tcSaveRequestId;
+
+
+    try {
+
+        const {
+            error
+        } =
+            await client
+                .from(
+                    TC_TABLE
+                )
+                .upsert(
+                    payload,
+                    {
+                        onConflict:
+                            "month"
+                    }
+                );
+
+
+        if (requestId !== tcSaveRequestId) {
+
+            return;
+
+        }
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        console.log(
+            "TC 数据已保存到 Supabase：",
+            data.month
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "TC 数据保存到 Supabase 失败：",
+            error
+        );
+
+    }
 
 }
 
-// =======================
+
+// =====================================================
+// 防抖保存
+// =====================================================
+
+function scheduleSupabaseSave() {
+
+    if (tcSaveTimer) {
+
+        clearTimeout(
+            tcSaveTimer
+        );
+
+    }
+
+
+    tcSaveTimer =
+        setTimeout(
+            function() {
+
+                const data =
+                    getCurrentTCData();
+
+
+                saveTCToSupabase(
+                    data
+                );
+
+            },
+            500
+        );
+
+}
+
+
+// =====================================================
 // 保存数据
-// =======================
+// =====================================================
+
+function saveData() {
+
+    const data =
+        getCurrentTCData();
 
 
-function saveData(){
+    saveLocalData(
+        data
+    );
 
 
-
-let data={};
-
-
-
-
-document
-.querySelectorAll(
-"input"
-)
-.forEach(function(input){
-
-
-
-if(input.id){
-
-
-data[input.id]=
-input.value;
-
+    scheduleSupabaseSave();
 
 }
 
 
-});
+// =====================================================
+// 从 Supabase 读取指定月份
+// =====================================================
+
+async function loadMonthData(
+    month
+) {
+
+    if (!month) {
+
+        return;
+
+    }
 
 
+    const client =
+        getTCClient();
 
 
+    if (!client) {
+
+        return;
+
+    }
 
 
-data.dailyMoney=[];
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await client
+                .from(
+                    TC_TABLE
+                )
+                .select("*")
+                .eq(
+                    "month",
+                    month
+                )
+                .maybeSingle();
 
 
+        if (error) {
 
-document
-.querySelectorAll(
-".daily-money"
-)
-.forEach(function(input){
+            throw error;
 
-
-data.dailyMoney.push(
-input.value
-);
+        }
 
 
-});
+        if (data) {
+
+            applyDatabaseData(
+                data
+            );
+
+            saveLocalData(
+                getCurrentTCData()
+            );
+
+            calculateMoneyTotal();
+
+            calculateSalesForecast();
+
+            calculateTC();
+
+            console.log(
+                "TC 数据已从 Supabase 恢复：",
+                month
+            );
+
+            return;
+
+        }
 
 
+        const localData =
+            loadLocalData();
 
 
+        if (
+            localData &&
+            localData.month === month
+        ) {
+
+            applyLocalData(
+                localData
+            );
+
+            calculateMoneyTotal();
+
+            calculateSalesForecast();
+
+            calculateTC();
+
+            scheduleSupabaseSave();
+
+            return;
+
+        }
 
 
+        clearCurrentMonthData();
 
-data.dailySales=[];
+        calculateMoneyTotal();
 
+        calculateSalesForecast();
 
+        calculateTC();
 
-document
-.querySelectorAll(
-".daily-sales"
-)
-.forEach(function(input){
+    }
+    catch (error) {
 
-
-data.dailySales.push(
-input.value
-);
-
-
-});
+        console.error(
+            "TC 月度数据读取失败：",
+            error
+        );
 
 
+        const localData =
+            loadLocalData();
 
 
+        if (
+            localData &&
+            localData.month === month
+        ) {
 
+            applyLocalData(
+                localData
+            );
 
+            calculateMoneyTotal();
 
-localStorage.setItem(
+            calculateSalesForecast();
 
-"TC_Data",
+            calculateTC();
 
-JSON.stringify(data)
+        }
 
-);
-
-
+    }
 
 }
 
 
+// =====================================================
+// 应用数据库数据
+// =====================================================
+
+function applyDatabaseData(
+    data
+) {
+
+    setInputValue(
+        "month",
+        data.month || ""
+    );
 
 
+    setInputValue(
+        "exchange-rate",
+        data.exchange_rate
+    );
 
 
+    setInputValue(
+        "default-money",
+        data.default_money
+    );
 
 
+    setInputValue(
+        "product-cost",
+        data.product_cost
+    );
 
-// =======================
+
+    setInputValue(
+        "ads-cost",
+        data.ads_cost
+    );
+
+
+    setInputValue(
+        "warehouse-cost",
+        data.warehouse_cost
+    );
+
+
+    setInputValue(
+        "shipping-cost",
+        data.shipping_cost
+    );
+
+
+    setInputValue(
+        "sample-cost",
+        data.sample_cost
+    );
+
+
+    setInputValue(
+        "other-cost",
+        data.other_cost
+    );
+
+
+    setInputValue(
+        "social-security-cost",
+        data.social_security_cost
+    );
+
+
+    setInputValue(
+        "deduction-cost",
+        data.deduction_cost
+    );
+
+
+    applyDailyValues(
+        data.daily_money,
+        data.daily_sales
+    );
+
+}
+
+
+// =====================================================
+// 应用本地数据
+// =====================================================
+
+function applyLocalData(
+    data
+) {
+
+    if (!data) {
+
+        return;
+
+    }
+
+
+    setInputValue(
+        "exchange-rate",
+        data.exchangeRate
+    );
+
+
+    setInputValue(
+        "default-money",
+        data.defaultMoney
+    );
+
+
+    setInputValue(
+        "product-cost",
+        data.productCost
+    );
+
+
+    setInputValue(
+        "ads-cost",
+        data.adsCost
+    );
+
+
+    setInputValue(
+        "warehouse-cost",
+        data.warehouseCost
+    );
+
+
+    setInputValue(
+        "shipping-cost",
+        data.shippingCost
+    );
+
+
+    setInputValue(
+        "sample-cost",
+        data.sampleCost
+    );
+
+
+    setInputValue(
+        "other-cost",
+        data.otherCost
+    );
+
+
+    setInputValue(
+        "social-security-cost",
+        data.socialSecurityCost
+    );
+
+
+    setInputValue(
+        "deduction-cost",
+        data.deductionCost
+    );
+
+
+    applyDailyValues(
+        data.dailyMoney,
+        data.dailySales
+    );
+
+}
+
+
+// =====================================================
+// 清空当前月份数据
+// =====================================================
+
+function clearCurrentMonthData() {
+
+    const ids = [
+
+        "exchange-rate",
+
+        "default-money",
+
+        "product-cost",
+
+        "ads-cost",
+
+        "warehouse-cost",
+
+        "shipping-cost",
+
+        "sample-cost",
+
+        "other-cost",
+
+        "social-security-cost",
+
+        "deduction-cost"
+
+    ];
+
+
+    ids.forEach(function(id) {
+
+        setInputValue(
+            id,
+            ""
+        );
+
+    });
+
+
+    document
+        .querySelectorAll(
+            ".daily-money"
+        )
+        .forEach(function(input) {
+
+            input.value = "";
+
+        });
+
+
+    document
+        .querySelectorAll(
+            ".daily-sales"
+        )
+        .forEach(function(input) {
+
+            input.value = "";
+
+        });
+
+}
+
+
+// =====================================================
 // 加载数据
-// =======================
+// =====================================================
+
+async function loadData() {
+
+    const month =
+        getInputValue(
+            "month"
+        );
 
 
-function loadData(){
+    if (month) {
+
+        await loadMonthData(
+            month
+        );
+
+        return;
+
+    }
 
 
-
-let saved =
-localStorage.getItem(
-"TC_Data"
-);
+    const localData =
+        loadLocalData();
 
 
+    if (
+        localData &&
+        localData.month
+    ) {
 
-if(!saved){
-
-return;
-
-}
-
-
-
-
-let data =
-JSON.parse(saved);
+        setInputValue(
+            "month",
+            localData.month
+        );
 
 
+        generateDays(
+            localData.dailyMoney,
+            localData.dailySales
+        );
 
 
+        applyLocalData(
+            localData
+        );
 
 
-Object.keys(data)
-.forEach(function(key){
+        calculateMoneyTotal();
+
+        calculateSalesForecast();
+
+        calculateTC();
 
 
+        await loadMonthData(
+            localData.month
+        );
 
-let input =
-document.getElementById(
-key
-);
-
-
-
-
-if(input){
-
-
-
-input.value =
-data[key];
-
-
-}
-
-
-
-});
-
-
-
-
-
-
-
-calculateMoneyTotal();
-
-
-calculateSalesForecast();
-
-
-calculateTC();
-
-
+    }
 
 }
 
 
-
-
-
-
-
-
-
-
-// =======================
+// =====================================================
 // 页面加载
-// =======================
-
+// =====================================================
 
 document.addEventListener(
-"DOMContentLoaded",
-function(){
+    "DOMContentLoaded",
+    async function() {
+
+        const monthInput =
+            document.getElementById(
+                "month"
+            );
 
 
+        if (monthInput) {
+
+            monthInput.addEventListener(
+                "click",
+                function() {
+
+                    if (
+                        this.showPicker
+                    ) {
+
+                        this.showPicker();
+
+                    }
+
+                }
+            );
 
 
+            monthInput.addEventListener(
+                "change",
+                handleMonthChange
+            );
 
-// 月份选择器
+        }
 
-let monthInput =
-document.getElementById(
-"month"
+
+        const localData =
+            loadLocalData();
+
+
+        if (
+            localData &&
+            localData.month
+        ) {
+
+            setInputValue(
+                "month",
+                localData.month
+            );
+
+
+            generateDays(
+                localData.dailyMoney,
+                localData.dailySales
+            );
+
+
+            applyLocalData(
+                localData
+            );
+
+        }
+
+
+        await loadData();
+
+
+        document
+            .querySelectorAll(
+                "input:not(.daily-money):not(.daily-sales)"
+            )
+            .forEach(function(input) {
+
+                input.addEventListener(
+                    "input",
+                    handleTCInput
+                );
+
+            });
+
+
+        calculateMoneyTotal();
+
+        calculateSalesForecast();
+
+        calculateTC();
+
+    }
 );
-
-
-
-
-
-if(monthInput){
-
-
-monthInput.addEventListener(
-"click",
-function(){
-
-
-if(this.showPicker){
-
-
-this.showPicker();
-
-
-}
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-// 恢复月份
-
-
-let saved =
-localStorage.getItem(
-"TC_Data"
-);
-
-
-
-
-if(saved){
-
-
-
-let data =
-JSON.parse(saved);
-
-
-
-
-if(data.month){
-
-
-
-let month =
-document.getElementById(
-"month"
-);
-
-
-
-if(month){
-
-
-
-month.value =
-data.month;
-
-
-
-generateDays();
-
-
-
-}
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-loadData();
-
-
-
-
-
-
-
-
-// 全局输入监听
-
-
-document
-.querySelectorAll(
-"input"
-)
-.forEach(function(input){
-
-
-
-input.addEventListener(
-"input",
-function(){
-
-
-
-saveData();
-
-
-calculateMoneyTotal();
-
-
-calculateSalesForecast();
-
-
-calculateTC();
-
-
-
-});
-
-
-});
-
-
-
-
-
-
-
-});
