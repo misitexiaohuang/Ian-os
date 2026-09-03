@@ -252,6 +252,11 @@ function getCurrentTCData() {
                 "deduction-cost"
             ),
 
+        destructionCost:
+            getInputValue(
+                "destruction-cost"
+            ),
+
         dailyMoney:
             getDailyMoneyValues(),
 
@@ -927,6 +932,12 @@ function calculateTC() {
         );
 
 
+    const destruction =
+        getNumberValue(
+            "destruction-cost"
+        );
+
+
     const totalCost =
 
         goodsCost
@@ -957,7 +968,11 @@ function calculateTC() {
 
         +
 
-        deduction;
+        deduction
+
+        +
+
+        destruction;
 
 
     const profit =
@@ -1039,6 +1054,15 @@ function calculateTC() {
 
 
 <p>
+🗑️ 销毁费：
+<strong>
+¥${destruction.toFixed(2)}
+</strong>
+</p>
+
+
+
+<p>
 💸 总成本：
 <strong>
 ¥${totalCost.toFixed(2)}
@@ -1091,7 +1115,8 @@ const TC_FIELD_MAP = {
     "sample-cost": "sample_cost",
     "other-cost": "other_cost",
     "social-security-cost": "social_security_cost",
-    "deduction-cost": "deduction_cost"
+    "deduction-cost": "deduction_cost",
+    "destruction-cost": "destruction_cost"
 
 };
 
@@ -1567,6 +1592,12 @@ function applyDatabaseData(
     );
 
 
+    setInputValue(
+        "destruction-cost",
+        data.destruction_cost
+    );
+
+
 
 }
 
@@ -1646,6 +1677,12 @@ function applyLocalData(
     );
 
 
+    setInputValue(
+        "destruction-cost",
+        data.destructionCost
+    );
+
+
     applyDailyValues(
         data.dailyMoney,
         data.dailySales
@@ -1680,7 +1717,9 @@ function clearCurrentMonthData() {
 
         "social-security-cost",
 
-        "deduction-cost"
+        "deduction-cost",
+
+        "destruction-cost"
 
     ];
 
