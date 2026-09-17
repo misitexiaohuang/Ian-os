@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    销量数据 - Ian OS
+  </title>
+
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="sales.css"
+  >
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+  <!-- =========================
+       左侧导航
+  ========================== -->
+
+  <aside class="sidebar">
+
+    <div class="brand">
+
+      <h2>
+        Ian OS
+      </h2>
+
+      <p>
+        TikTok运营效率工具
+      </p>
+
+    </div>
+
+
+    <div
+      class="menu"
+      id="menu"
+    ></div>
+
+
+    <div class="sidebar-footer">
+
+      Ian OS v1.0
+
+    </div>
+
+  </aside>
+
+
+
+  <!-- =========================
+       主内容
+  ========================== -->
+
+  <main class="content">
+
+    <div class="page-container">
+
+
+      <!-- =========================
+           页面标题
+      ========================== -->
+
+      <div
+        class="page-header"
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:20px;
+        "
+      >
+
+        <div>
+
+          <h1>
+            销量数据
+          </h1>
+
+          <p>
+            通过趋势图查看每天、产品以及 Variant 的销量变化
+          </p>
+
+        </div>
+
+
+        <!-- =========================
+             销量数据导入入口
+        ========================== -->
+
+        <a
+          href="sales-import.html"
+          style="
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:7px;
+
+            padding:10px 14px;
+
+            background:#ffffff;
+            color:#111111;
+
+            border:1px solid #e5e5e5;
+            border-radius:10px;
+
+            font-size:14px;
+            font-weight:600;
+
+            text-decoration:none;
+            white-space:nowrap;
+
+            transition:
+              background .2s ease,
+              border-color .2s ease,
+              transform .2s ease;
+          "
+          onmouseover="
+            this.style.background='#f7f7f7';
+            this.style.borderColor='#d5d5d5';
+          "
+          onmouseout="
+            this.style.background='#ffffff';
+            this.style.borderColor='#e5e5e5';
+          "
+          onmousedown="
+            this.style.transform='scale(.98)';
+          "
+          onmouseup="
+            this.style.transform='scale(1)';
+          "
+        >
+
+          <span>
+            📥
+          </span>
+
+          导入销量数据
+
+        </a>
+
+      </div>
+
+
+
+      <!-- =========================
+           数据筛选
+      ========================== -->
+
+      <div class="tool-card filter-card">
+
+        <div class="section-heading">
+
+          <div>
+
+            <div class="card-title">
+              数据筛选
+            </div>
+
+            <div class="section-subtitle">
+              选择月份查看对应销量趋势
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="filter-row">
+
+          <div class="filter-item">
+
+            <label for="month-select">
+              月份
+            </label>
+
+
+            <select id="month-select">
+
+              <option value="">
+                正在读取...
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =========================
+           月度概览
+      ========================== -->
+
+      <div
+        id="overview-card"
+        class="tool-card"
+      >
+
+        <div class="section-heading">
+
+          <div>
+
+            <div class="card-title">
+              月度概览
+            </div>
+
+
+            <div
+              id="overview-month"
+              class="section-subtitle"
+            >
+              等待读取数据
+            </div>
+
+          </div>
+
+
+          <div
+            id="data-status"
+            class="status-badge"
+          >
+            读取中
+          </div>
+
+        </div>
+
+
+        <div class="summary-grid">
+
+          <div class="summary-item">
+
+            <span>
+              本月销量
+            </span>
+
+            <strong id="month-sales">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="summary-item">
+
+            <span>
+              产品数量
+            </span>
+
+            <strong id="month-products">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="summary-item">
+
+            <span>
+              Variant 数量
+            </span>
+
+            <strong id="month-variants">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="summary-item">
+
+            <span>
+              日均销量
+            </span>
+
+            <strong id="average-daily-sales">
+              0
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =========================
+           每日销量趋势
+      ========================== -->
+
+      <div class="tool-card">
+
+        <div class="section-heading">
+
+          <div>
+
+            <div class="card-title">
+              每日销量趋势
+            </div>
+
+
+            <div
+              id="daily-chart-subtitle"
+              class="section-subtitle"
+            >
+              查看当前月份每天的总销量变化
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="daily-chart"
+          class="chart-container"
+        >
+
+          <div class="chart-empty">
+            正在读取销量数据...
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =========================
+           产品销量趋势
+      ========================== -->
+
+      <div class="tool-card">
+
+        <div class="section-heading">
+
+          <div>
+
+            <div class="card-title">
+              产品销量趋势
+            </div>
+
+
+            <div class="section-subtitle">
+              选择一个产品，查看该产品每天的销量变化
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="filter-row">
+
+          <div class="filter-item">
+
+            <label for="product-select">
+              产品
+            </label>
+
+
+            <select id="product-select">
+
+              <option value="">
+                请选择产品
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="product-chart"
+          class="chart-container chart-hidden"
+        >
+
+          <div class="chart-empty">
+            请选择产品
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =========================
+           Variant 销量趋势
+
+           产品
+              ↓
+           颜色
+              ↓
+           尺码
+
+           产品 + 颜色
+           = 该颜色所有尺码的每日销量
+
+           产品 + 颜色 + 尺码
+           = 精确到该 Variant 的每日销量
+      ========================== -->
+
+      <div class="tool-card">
+
+        <div class="section-heading">
+
+          <div>
+
+            <div class="card-title">
+              Variant 销量趋势
+            </div>
+
+
+            <div class="section-subtitle">
+              选择产品、颜色和尺码，查看对应的每日销量变化
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="filter-row variant-filter-row">
+
+
+          <!-- =========================
+               Variant 产品
+          ========================== -->
+
+          <div class="filter-item">
+
+            <label for="variant-product-select">
+              产品
+            </label>
+
+
+            <select
+              id="variant-product-select"
+            >
+
+              <option value="">
+                请选择产品
+              </option>
+
+            </select>
+
+          </div>
+
+
+
+          <!-- =========================
+               Variant 颜色
+          ========================== -->
+
+          <div class="filter-item">
+
+            <label for="variant-color-select">
+              颜色
+            </label>
+
+
+            <select
+              id="variant-color-select"
+              disabled
+            >
+
+              <option value="">
+                请先选择产品
+              </option>
+
+            </select>
+
+          </div>
+
+
+
+          <!-- =========================
+               Variant 尺码
+          ========================== -->
+
+          <div class="filter-item">
+
+            <label for="variant-size-select">
+              尺码
+            </label>
+
+
+            <select
+              id="variant-size-select"
+              disabled
+            >
+
+              <option value="">
+                请先选择颜色
+              </option>
+
+            </select>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- =========================
+             Variant 图表
+        ========================== -->
+
+        <div
+          id="variant-chart"
+          class="chart-container chart-hidden"
+        >
+
+          <div class="chart-empty">
+            请选择产品和颜色
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =========================
+           页面状态信息
+      ========================== -->
+
+      <div
+        id="sales-message"
+        class="sales-message"
+      ></div>
+
+
+    </div>
+
+  </main>
+
+</div>
+
+
+
+<!-- =========================
+     Supabase
+========================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script src="supabase.js"></script>
+
+
+
+<!-- =========================
+     导航
+========================== -->
+
+<script src="nav.js"></script>
+
+
+
+<!-- =========================
+     销量页面逻辑
+========================== -->
+
+<script src="sales.js"></script>
+
+
+</body>
+
+</html>

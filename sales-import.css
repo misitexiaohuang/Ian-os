@@ -1,0 +1,827 @@
+/* =========================================================
+   Ian OS - 销量数据导入页面
+   黑白 / Apple / Notion 风格
+   不修改 Ian OS 原有 style.css
+   ========================================================= */
+
+
+/* =========================================================
+   页面容器
+   ========================================================= */
+
+.page-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 42px 32px 60px;
+}
+
+
+/* =========================================================
+   页面标题
+   ========================================================= */
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #111;
+}
+
+.page-header p {
+  margin: 0;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   通用卡片
+   ========================================================= */
+
+.tool-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 26px;
+  margin-bottom: 18px;
+
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.02);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.tool-card:hover {
+  border-color: #dedede;
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.035);
+}
+
+
+/* =========================================================
+   卡片标题
+   ========================================================= */
+
+.card-title {
+  margin: 0;
+
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 650;
+
+  color: #171717;
+}
+
+
+/* =========================================================
+   Section Header
+   ========================================================= */
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 22px;
+}
+
+
+.section-subtitle {
+  margin-top: 6px;
+
+  color: #888;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   状态 Badge
+   ========================================================= */
+
+.status-badge {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 28px;
+
+  padding: 0 11px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 999px;
+
+  background: #fafafa;
+
+  color: #888;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+.status-badge.is-ready {
+  border-color: #d8d8d8;
+
+  background: #f5f5f5;
+
+  color: #222;
+}
+
+
+/* =========================================================
+   Excel 上传区域
+   ========================================================= */
+
+.upload-card {
+  padding-bottom: 24px;
+}
+
+
+.upload-box {
+  border: 1px dashed #d2d2d2;
+  border-radius: 12px;
+
+  padding: 22px;
+
+  background: #fafafa;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.upload-box:hover {
+  border-color: #999;
+  background: #f8f8f8;
+}
+
+
+.upload-box input[type="file"] {
+  display: block;
+
+  width: 100%;
+
+  font-size: 13px;
+  color: #333;
+
+  cursor: pointer;
+}
+
+
+.upload-box input[type="file"]::file-selector-button {
+  margin-right: 12px;
+
+  padding: 9px 14px;
+
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+
+  background: #fff;
+
+  color: #222;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.upload-box input[type="file"]::file-selector-button:hover {
+  background: #f4f4f4;
+  border-color: #bbb;
+}
+
+
+.upload-tip {
+  margin-top: 12px;
+
+  color: #888;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   按钮
+   ========================================================= */
+
+.button-row {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 18px;
+}
+
+
+.primary-btn {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border: 1px solid #222;
+  border-radius: 9px;
+
+  background: #222;
+
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 550;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.1s ease,
+    opacity 0.2s ease;
+}
+
+
+.primary-btn:hover:not(:disabled) {
+  background: #000;
+  border-color: #000;
+}
+
+
+.primary-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+
+.primary-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   数据统计
+   ========================================================= */
+
+.summary-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-bottom: 26px;
+}
+
+
+.summary-item {
+  min-width: 0;
+
+  padding: 18px;
+
+  border: 1px solid #ededed;
+  border-radius: 12px;
+
+  background: #fafafa;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.summary-item:hover {
+  background: #f7f7f7;
+  border-color: #dedede;
+}
+
+
+.summary-item span {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #888;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+.summary-item strong {
+  display: block;
+
+  color: #171717;
+
+  font-size: 25px;
+  line-height: 1.2;
+
+  font-weight: 650;
+
+  letter-spacing: -0.4px;
+}
+
+
+/* =========================================================
+   Sheet 列表标题
+   ========================================================= */
+
+.list-heading {
+  margin-bottom: 2px;
+
+  color: #555;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   Sheet 列表
+   ========================================================= */
+
+.sheet-list {
+  margin-top: 4px;
+
+  border-top: 1px solid #eee;
+}
+
+
+.sheet-item {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding: 14px 2px;
+
+  border-bottom: 1px solid #eee;
+}
+
+
+.sheet-item > div:first-child {
+  min-width: 0;
+}
+
+
+.sheet-item strong {
+  display: block;
+
+  color: #222;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+.sheet-item span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #888;
+
+  font-size: 12px;
+}
+
+
+.sheet-item > div:last-child {
+  flex-shrink: 0;
+
+  color: #999;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   导入进度
+   ========================================================= */
+
+.progress-wrap {
+  width: 100%;
+  height: 7px;
+
+  overflow: hidden;
+
+  background: #eeeeee;
+
+  border-radius: 999px;
+}
+
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+
+  background: #222;
+
+  border-radius: 999px;
+
+  transition: width 0.2s ease;
+}
+
+
+.progress-text {
+  margin-top: 10px;
+
+  color: #777;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   导入结果卡片
+   ========================================================= */
+
+.import-result {
+  margin-top: 24px;
+
+  padding: 22px;
+
+  border: 1px solid #dedede;
+  border-radius: 14px;
+
+  background: #fafafa;
+}
+
+
+/* =========================================================
+   Result Header
+   ========================================================= */
+
+.result-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 20px;
+}
+
+
+.result-title {
+  color: #171717;
+
+  font-size: 17px;
+  font-weight: 650;
+
+  line-height: 1.4;
+}
+
+
+.result-subtitle {
+  margin-top: 5px;
+
+  color: #888;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+.result-check {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  height: 30px;
+
+  flex-shrink: 0;
+
+  border: 1px solid #d5d5d5;
+  border-radius: 50%;
+
+  background: #fff;
+
+  color: #222;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   新增 / 更新 / 总计
+   ========================================================= */
+
+.result-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+
+.result-item {
+  min-width: 0;
+
+  padding: 17px;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 11px;
+
+  background: #fff;
+}
+
+
+.result-item span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #888;
+
+  font-size: 12px;
+}
+
+
+.result-item strong {
+  display: inline-block;
+
+  color: #171717;
+
+  font-size: 24px;
+  line-height: 1.2;
+
+  font-weight: 650;
+
+  letter-spacing: -0.3px;
+}
+
+
+.result-item small {
+  margin-left: 5px;
+
+  color: #999;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   结果底部状态
+   ========================================================= */
+
+.result-footer {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-top: 16px;
+
+  padding-top: 14px;
+
+  border-top: 1px solid #e8e8e8;
+
+  color: #777;
+
+  font-size: 12px;
+}
+
+
+.result-success-dot {
+  width: 6px;
+  height: 6px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #222;
+}
+
+
+/* =========================================================
+   原有结果消息
+   ========================================================= */
+
+.result-message {
+  margin-top: 14px;
+
+  color: #777;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+}
+
+
+.result-message.success {
+  color: #555;
+}
+
+
+.result-message.error {
+  color: #b42318;
+}
+
+
+/* =========================================================
+   隐藏
+   ========================================================= */
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =========================================================
+   文件上传卡片的小间距调整
+   ========================================================= */
+
+.upload-card .card-title {
+  margin-bottom: 16px;
+}
+
+
+/* =========================================================
+   移动端
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .summary-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .result-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+
+@media (max-width: 760px) {
+
+  .page-container {
+    padding: 24px 18px 40px;
+  }
+
+
+  .page-header {
+    margin-bottom: 20px;
+  }
+
+
+  .page-header h1 {
+    font-size: 26px;
+  }
+
+
+  .tool-card {
+    padding: 20px;
+
+    border-radius: 14px;
+  }
+
+
+  .section-heading {
+    align-items: flex-start;
+  }
+
+
+  .summary-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+  }
+
+
+  .summary-item {
+    padding: 15px;
+  }
+
+
+  .summary-item strong {
+    font-size: 21px;
+  }
+
+
+  .button-row {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .primary-btn {
+    width: 100%;
+  }
+
+
+  .sheet-item {
+    align-items: flex-start;
+
+    gap: 10px;
+  }
+
+
+  .sheet-item > div:last-child {
+    text-align: right;
+  }
+
+
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .result-item {
+    padding: 15px;
+  }
+
+
+  .result-item strong {
+    font-size: 22px;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .page-container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+
+  .tool-card {
+    padding: 17px;
+  }
+
+
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+
+  .summary-item span {
+    font-size: 11px;
+  }
+
+
+  .summary-item strong {
+    font-size: 19px;
+  }
+
+
+  .upload-box {
+    padding: 17px;
+  }
+
+
+  .upload-box input[type="file"] {
+    font-size: 12px;
+  }
+
+
+  .section-heading {
+    gap: 12px;
+  }
+
+
+  .status-badge {
+    padding: 0 9px;
+
+    font-size: 11px;
+  }
+}

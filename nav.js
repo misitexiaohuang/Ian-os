@@ -1,607 +1,381 @@
+/* =========================================================
+   Ian OS - 全局导航
+========================================================= */
+
 const menuData = [
-
-
-    {
-        id:"home",
-        name:"🏠 首页",
-        url:"index.html"
-    },
-
-
-    {
-        id:"shop-data",
-        name:"📊 店铺数据分析",
-        url:"shop-data.html"
-    },
-
-
-    {
-    id:"size-helper",
-    name:"👕 尺码助手",
-    url:"size-helper.html"
-    },
-
-
-    {
-        id:"creator-admin",
-        name:"🧑‍💻 达人尺码管理",
-        url:"creator-admin.html"
-    },
-
-
-    {
-        id:"commission",
-        name:"💰 当月TC预估",
-        url:"commission.html"
-    },
-
-
-    {
-        id:"destroy",
-        name:"🗑️ 销毁费用预估",
-        url:"destroy.html"
-    },
-
-
-    {
-        id:"sample",
-        name:"📦 寄样审核",
-        url:"sample.html"
-    }
-
-
+  {
+    id: "home",
+    name: "🏠 首页",
+    url: "index.html"
+  },
+  {
+    id: "shop-data",
+    name: "📊 店铺数据分析",
+    url: "shop-data.html"
+  },
+  {
+    id: "sales",
+    name: "📈 销量数据",
+    url: "sales.html"
+  },
+  {
+    id: "size-helper",
+    name: "👕 尺码助手",
+    url: "size-helper.html"
+  },
+  {
+    id: "creator-admin",
+    name: "🧑‍💻 达人尺码管理",
+    url: "creator-admin.html"
+  },
+  {
+    id: "commission",
+    name: "💰 当月TC预估",
+    url: "commission.html"
+  },
+  {
+    id: "destroy",
+    name: "🗑️ 销毁费用预估",
+    url: "destroy.html"
+  },
+  {
+    id: "sample",
+    name: "📦 寄样审核",
+    url: "sample.html"
+  }
 ];
 
 
-// =====================================================
-// 读取保存顺序
-// =====================================================
+/* =========================================================
+   DOM
+========================================================= */
 
-let menuOrder =
-    JSON.parse(
-        localStorage.getItem("menuOrder")
+const menuElement = document.getElementById("menu");
+
+
+/* =========================================================
+   LocalStorage
+========================================================= */
+
+const MENU_ORDER_KEY = "ian-os-menu-order";
+
+
+/* =========================================================
+   读取用户保存的菜单顺序
+========================================================= */
+
+function getSavedOrder() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(MENU_ORDER_KEY);
+
+    if (!saved) {
+      return null;
+    }
+
+    const parsed =
+      JSON.parse(saved);
+
+    if (!Array.isArray(parsed)) {
+      return null;
+    }
+
+    return parsed;
+
+  } catch (error) {
+
+    console.error(
+      "读取菜单排序失败:",
+      error
+    );
+
+    return null;
+  }
+}
+
+
+/* =========================================================
+   保存菜单顺序
+========================================================= */
+
+function saveMenuOrder() {
+
+  if (!menuElement) {
+    return;
+  }
+
+  const items =
+    [...menuElement.querySelectorAll(".menu-item")];
+
+  const order =
+    items.map(item => item.dataset.id);
+
+  localStorage.setItem(
+    MENU_ORDER_KEY,
+    JSON.stringify(order)
+  );
+}
+
+
+/* =========================================================
+   判断当前页面
+========================================================= */
+
+function isCurrentPage(url) {
+
+  const currentPath =
+    window.location.pathname;
+
+  const currentFile =
+    currentPath.split("/").pop();
+
+  if (!currentFile) {
+
+    return url === "index.html";
+  }
+
+  return currentFile === url;
+}
+
+
+/* =========================================================
+   渲染导航
+========================================================= */
+
+function renderMenu() {
+
+  if (!menuElement) {
+    return;
+  }
+
+  menuElement.innerHTML = "";
+
+
+  /* -----------------------------------------
+     默认菜单顺序
+  ----------------------------------------- */
+
+  let orderedMenu =
+    [...menuData];
+
+
+  /* -----------------------------------------
+     读取用户保存的排序
+  ----------------------------------------- */
+
+  const savedOrder =
+    getSavedOrder();
+
+
+  if (savedOrder) {
+
+    const orderMap =
+      new Map();
+
+    savedOrder.forEach(
+      (id, index) => {
+
+        orderMap.set(
+          id,
+          index
+        );
+
+      }
     );
 
 
-// =====================================================
-// 如果没有保存
-// 使用默认顺序
-// =====================================================
+    orderedMenu.sort(
+      (a, b) => {
 
-if(!Array.isArray(menuOrder)){
+        const aIndex =
+          orderMap.has(a.id)
+            ? orderMap.get(a.id)
+            : 9999;
 
-    menuOrder =
-        menuData.map(
-            item => item.id
+        const bIndex =
+          orderMap.has(b.id)
+            ? orderMap.get(b.id)
+            : 9999;
+
+        return aIndex - bIndex;
+      }
+    );
+  }
+
+
+  /* -----------------------------------------
+     创建菜单
+  ----------------------------------------- */
+
+  orderedMenu.forEach(item => {
+
+    const link =
+      document.createElement("a");
+
+    link.href =
+      item.url;
+
+    link.className =
+      "menu-item";
+
+    link.dataset.id =
+      item.id;
+
+    link.draggable =
+      true;
+
+    link.textContent =
+      item.name;
+
+
+    /* 当前页面高亮 */
+
+    if (isCurrentPage(item.url)) {
+
+      link.classList.add(
+        "active"
+      );
+    }
+
+
+    menuElement.appendChild(
+      link
+    );
+
+  });
+
+
+  /* -----------------------------------------
+     启用拖拽排序
+  ----------------------------------------- */
+
+  enableDragAndDrop();
+}
+
+
+/* =========================================================
+   拖拽排序
+========================================================= */
+
+function enableDragAndDrop() {
+
+  if (!menuElement) {
+    return;
+  }
+
+  const items =
+    [
+      ...menuElement.querySelectorAll(
+        ".menu-item"
+      )
+    ];
+
+  let draggedItem =
+    null;
+
+
+  items.forEach(item => {
+
+
+    /* -----------------------------------------
+       开始拖拽
+    ----------------------------------------- */
+
+    item.addEventListener(
+      "dragstart",
+      event => {
+
+        draggedItem =
+          item;
+
+        item.classList.add(
+          "dragging"
         );
 
-}
+        event.dataTransfer.effectAllowed =
+          "move";
+      }
+    );
 
 
-// =====================================================
-// 自动补充新增菜单
-// =====================================================
+    /* -----------------------------------------
+       拖拽结束
+    ----------------------------------------- */
 
-menuData.forEach(item => {
+    item.addEventListener(
+      "dragend",
+      () => {
 
-    if(!menuOrder.includes(item.id)){
-
-        menuOrder.push(item.id);
-
-    }
-
-});
-
-
-// =====================================================
-// 清理不存在的旧菜单
-// =====================================================
-
-menuOrder =
-    menuOrder.filter(id => {
-
-        return menuData.some(
-            item => item.id === id
+        item.classList.remove(
+          "dragging"
         );
 
-    });
+        draggedItem =
+          null;
 
+        saveMenuOrder();
+      }
+    );
 
-// =====================================================
-// 拖动状态
-// =====================================================
 
-let dragIndex = null;
+    /* -----------------------------------------
+       拖拽经过
+    ----------------------------------------- */
 
-let dragItem = null;
+    item.addEventListener(
+      "dragover",
+      event => {
 
-let dropIndex = null;
+        event.preventDefault();
 
 
-// =====================================================
-// 创建拖动占位线
-// =====================================================
+        if (
+          !draggedItem ||
+          draggedItem === item
+        ) {
 
-function createDropLine(){
-
-    let line =
-        document.createElement("div");
-
-
-    line.className =
-        "nav-drop-line";
-
-
-    line.style.height = "3px";
-
-    line.style.background = "#1677ff";
-
-    line.style.borderRadius = "3px";
-
-    line.style.margin = "4px 8px";
-
-
-    return line;
-
-}
-
-
-// =====================================================
-// 清除拖动提示
-// =====================================================
-
-function clearDragIndicator(){
-
-    document
-        .querySelectorAll(".nav-drop-line")
-        .forEach(function(line){
-
-            line.remove();
-
-        });
-
-
-    document
-        .querySelectorAll(".menu-item")
-        .forEach(function(item){
-
-            item.style.opacity = "";
-
-        });
-
-}
-
-
-// =====================================================
-// 显示预计落地位置
-// =====================================================
-
-function showDropIndicator(targetElement, after){
-
-    clearDragIndicator();
-
-
-    let line =
-        createDropLine();
-
-
-    if(after){
-
-        targetElement
-            .parentNode
-            .insertBefore(
-                line,
-                targetElement.nextSibling
-            );
-
-    }else{
-
-        targetElement
-            .parentNode
-            .insertBefore(
-                line,
-                targetElement
-            );
-
-    }
-
-}
-
-
-// =====================================================
-// 渲染导航
-// =====================================================
-
-function renderMenu(){
-
-
-    let menu =
-        document.getElementById("menu");
-
-
-    if(!menu){
-
-        return;
-
-    }
-
-
-    menu.innerHTML = "";
-
-
-    menuOrder.forEach(
-        function(id,index){
-
-
-            let item =
-                menuData.find(
-                    x => x.id === id
-                );
-
-
-            if(!item){
-
-                return;
-
-            }
-
-
-            let a =
-                document.createElement("a");
-
-
-            a.className =
-                "menu-item";
-
-
-            a.href =
-                item.url;
-
-
-            a.innerHTML =
-                item.name;
-
-
-            // =================================================
-            // 当前页面高亮
-            // =================================================
-
-            let page =
-                location.pathname
-                    .split("/")
-                    .pop();
-
-
-            if(page === item.url){
-
-                a.classList.add(
-                    "active"
-                );
-
-            }
-
-
-            // =================================================
-            // 开启拖动
-            // =================================================
-
-            a.draggable = true;
-
-
-            // =================================================
-            // 开始拖动
-            // =================================================
-
-            a.addEventListener(
-                "dragstart",
-                function(e){
-
-                    dragIndex = index;
-
-                    dragItem = a;
-
-
-                    // 浏览器拖动效果
-
-                    try{
-
-                        e.dataTransfer.effectAllowed =
-                            "move";
-
-                    }catch(error){}
-
-
-                    // 当前被拖动的项目变淡
-
-                    setTimeout(
-                        function(){
-
-                            if(dragItem){
-
-                                dragItem.style.opacity =
-                                    "0.45";
-
-                            }
-
-                        },
-                        0
-                    );
-
-                }
-            );
-
-
-            // =================================================
-            // 拖动经过
-            // =================================================
-
-            a.addEventListener(
-                "dragover",
-                function(e){
-
-                    e.preventDefault();
-
-
-                    if(
-                        dragIndex === null ||
-                        dragIndex === index
-                    ){
-
-                        return;
-
-                    }
-
-
-                    // 鼠标在当前菜单项目的什么位置
-
-                    let rect =
-                        a.getBoundingClientRect();
-
-
-                    let middle =
-                        rect.top +
-                        rect.height / 2;
-
-
-                    let after =
-                        e.clientY > middle;
-
-
-                    // 保存预计落地位置
-
-                    dropIndex = index;
-
-
-                    showDropIndicator(
-                        a,
-                        after
-                    );
-
-                }
-            );
-
-
-            // =================================================
-            // 拖动离开
-            // =================================================
-
-            a.addEventListener(
-                "dragleave",
-                function(){
-
-                    /*
-                     * 这里不立即删除线。
-                     *
-                     * 因为 dragleave 在浏览器里
-                     * 很容易频繁触发。
-                     *
-                     * 下一次 dragover 会自动更新。
-                     */
-
-                }
-            );
-
-
-            // =================================================
-            // 松手
-            // =================================================
-
-            a.addEventListener(
-                "drop",
-                function(e){
-
-                    e.preventDefault();
-
-
-                    if(
-                        dragIndex === null ||
-                        dragIndex === index
-                    ){
-
-                        clearDragIndicator();
-
-                        return;
-
-                    }
-
-
-                    let target =
-                        index;
-
-
-                    // =================================================
-                    // 判断放在目标前面还是后面
-                    // =================================================
-
-                    let rect =
-                        a.getBoundingClientRect();
-
-
-                    let middle =
-                        rect.top +
-                        rect.height / 2;
-
-
-                    let after =
-                        e.clientY > middle;
-
-
-                    // =================================================
-                    // 取出原来的菜单
-                    // =================================================
-
-                    let move =
-                        menuOrder.splice(
-                            dragIndex,
-                            1
-                        )[0];
-
-
-                    // =================================================
-                    // 计算真正插入位置
-                    // =================================================
-
-                    if(after){
-
-                        /*
-                         * 如果原来的项目在目标之前，
-                         * 删除后目标索引会自动减 1。
-                         */
-
-                        if(dragIndex < target){
-
-                            target--;
-
-                        }
-
-
-                        target++;
-
-                    }else{
-
-                        if(dragIndex < target){
-
-                            target--;
-
-                        }
-
-                    }
-
-
-                    // 防止越界
-
-                    if(target < 0){
-
-                        target = 0;
-
-                    }
-
-
-                    if(
-                        target >
-                        menuOrder.length
-                    ){
-
-                        target =
-                            menuOrder.length;
-
-                    }
-
-
-                    // =================================================
-                    // 插入新位置
-                    // =================================================
-
-                    menuOrder.splice(
-                        target,
-                        0,
-                        move
-                    );
-
-
-                    // =================================================
-                    // 保存
-                    // =================================================
-
-                    saveMenu();
-
-
-                    // =================================================
-                    // 清除提示
-                    // =================================================
-
-                    clearDragIndicator();
-
-
-                    dragIndex = null;
-
-                    dragItem = null;
-
-                    dropIndex = null;
-
-
-                    // =================================================
-                    // 重新渲染
-                    // =================================================
-
-                    renderMenu();
-
-                }
-            );
-
-
-            // =================================================
-            // 拖动结束
-            // =================================================
-
-            a.addEventListener(
-                "dragend",
-                function(){
-
-                    clearDragIndicator();
-
-
-                    dragIndex = null;
-
-                    dragItem = null;
-
-                    dropIndex = null;
-
-                }
-            );
-
-
-            menu.appendChild(a);
-
+          return;
         }
+
+
+        const rect =
+          item.getBoundingClientRect();
+
+        const middle =
+          rect.top +
+          rect.height / 2;
+
+
+        if (
+          event.clientY <
+          middle
+        ) {
+
+          menuElement.insertBefore(
+            draggedItem,
+            item
+          );
+
+        } else {
+
+          menuElement.insertBefore(
+            draggedItem,
+            item.nextSibling
+          );
+        }
+
+      }
     );
+
+  });
 
 }
 
 
-// =====================================================
-// 保存菜单顺序
-// =====================================================
+/* =========================================================
+   初始化
+========================================================= */
 
-function saveMenu(){
-
-    localStorage.setItem(
-        "menuOrder",
-        JSON.stringify(menuOrder)
-    );
-
-}
-
-
-// =====================================================
-// 页面加载
-// =====================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function(){
-
-        renderMenu();
-
-    }
-);
+renderMenu();

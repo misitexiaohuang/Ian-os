@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>销量数据导入 - Ian OS</title>
+
+  <!-- Ian OS 全局样式 -->
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <!-- 销量数据导入页面样式 -->
+  <link
+    rel="stylesheet"
+    href="sales-import.css"
+  >
+
+  <!--
+    Excel 解析库
+    只在浏览器本地解析上传的 Excel，
+    Excel 文件本身不会上传到第三方。
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+  <!-- =====================================================
+       左侧导航
+       ===================================================== -->
+
+  <aside class="sidebar">
+
+
+    <div class="brand">
+
+      <h2>
+        Ian OS
+      </h2>
+
+      <p>
+        TikTok运营系统
+      </p>
+
+    </div>
+
+
+    <!-- 动态导航 -->
+
+    <div
+      class="menu"
+      id="menu"
+    ></div>
+
+
+    <div class="sidebar-footer">
+
+      Ian OS v1.0
+
+    </div>
+
+
+  </aside>
+
+
+
+  <!-- =====================================================
+       右侧内容
+       ===================================================== -->
+
+  <main class="content">
+
+
+    <div class="page-container">
+
+
+      <!-- =================================================
+           页面标题
+           ================================================= -->
+
+      <div class="page-header">
+
+        <div>
+
+          <h1>
+            销量数据导入
+          </h1>
+
+          <p>
+            将腾讯文档导出的 Excel 导入 Supabase，
+            供销量分析使用
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =================================================
+           Excel 上传区域
+           ================================================= -->
+
+      <div class="tool-card upload-card">
+
+
+        <div class="card-title">
+          选择 Excel 文件
+        </div>
+
+
+        <div class="upload-box">
+
+
+          <input
+            id="excel-file"
+            type="file"
+            accept=".xlsx,.xls,.xlsm"
+          >
+
+
+          <div class="upload-tip">
+
+            支持腾讯文档导出的 Excel 文件。
+            系统只读取 2025.7、2025.8 …… 这种月度销量 Sheet。
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- 操作按钮 -->
+
+        <div class="button-row">
+
+
+          <button
+            id="preview-btn"
+            class="primary-btn"
+            type="button"
+          >
+            读取并预览
+          </button>
+
+
+          <button
+            id="import-btn"
+            class="primary-btn"
+            type="button"
+            disabled
+          >
+            开始导入 Supabase
+          </button>
+
+
+        </div>
+
+
+      </div>
+
+
+
+      <!-- =================================================
+           数据预览
+           ================================================= -->
+
+      <div
+        id="summary-card"
+        class="tool-card hidden"
+      >
+
+
+        <div class="section-heading">
+
+
+          <div>
+
+            <div class="card-title">
+              数据预览
+            </div>
+
+
+            <div
+              id="preview-month"
+              class="section-subtitle"
+            >
+              等待读取 Excel
+            </div>
+
+          </div>
+
+
+          <div
+            id="preview-status"
+            class="status-badge"
+          >
+            待读取
+          </div>
+
+
+        </div>
+
+
+
+        <!-- 数据统计 -->
+
+        <div class="summary-grid">
+
+
+          <div class="summary-item">
+
+            <span>
+              月度 Sheet
+            </span>
+
+            <strong id="sheet-count">
+              0
+            </strong>
+
+          </div>
+
+
+
+          <div class="summary-item">
+
+            <span>
+              产品数量
+            </span>
+
+            <strong id="product-count">
+              0
+            </strong>
+
+          </div>
+
+
+
+          <div class="summary-item">
+
+            <span>
+              变体数量
+            </span>
+
+            <strong id="variant-count">
+              0
+            </strong>
+
+          </div>
+
+
+
+          <div class="summary-item">
+
+            <span>
+              销量记录
+            </span>
+
+            <strong id="record-count">
+              0
+            </strong>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- Sheet 列表 -->
+
+        <div class="list-heading">
+
+          本次读取的 Sheet
+
+        </div>
+
+
+        <div
+          id="sheet-list"
+          class="sheet-list"
+        ></div>
+
+
+      </div>
+
+
+
+      <!-- =================================================
+           导入进度
+           ================================================= -->
+
+      <div
+        id="progress-card"
+        class="tool-card hidden"
+      >
+
+
+        <div class="section-heading">
+
+
+          <div>
+
+            <div class="card-title">
+              导入进度
+            </div>
+
+
+            <div
+              id="progress-text"
+              class="progress-text"
+            >
+              等待导入
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- 进度条 -->
+
+        <div class="progress-wrap">
+
+          <div
+            id="progress-bar"
+            class="progress-bar"
+          ></div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             导入结果
+             ================================================= -->
+
+        <div
+          id="import-result"
+          class="import-result hidden"
+        >
+
+
+          <div class="result-header">
+
+
+            <div>
+
+              <div class="result-title">
+                导入完成
+              </div>
+
+
+              <div
+                id="result-month"
+                class="result-subtitle"
+              >
+                销量数据已同步
+              </div>
+
+            </div>
+
+
+            <div class="result-check">
+              ✓
+            </div>
+
+
+          </div>
+
+
+
+          <!-- 新增 / 更新 / 总计 -->
+
+          <div class="result-grid">
+
+
+            <div class="result-item">
+
+              <span>
+                新增
+              </span>
+
+              <strong id="inserted-count">
+                0
+              </strong>
+
+              <small>
+                条记录
+              </small>
+
+            </div>
+
+
+
+            <div class="result-item">
+
+              <span>
+                更新
+              </span>
+
+              <strong id="updated-count">
+                0
+              </strong>
+
+              <small>
+                条记录
+              </small>
+
+            </div>
+
+
+
+            <div class="result-item">
+
+              <span>
+                总计
+              </span>
+
+              <strong id="total-imported-count">
+                0
+              </strong>
+
+              <small>
+                条记录
+              </small>
+
+            </div>
+
+
+          </div>
+
+
+
+          <div class="result-footer">
+
+            <span class="result-success-dot"></span>
+
+            <span>
+              数据已安全同步至 Supabase
+            </span>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- 错误提示 -->
+
+        <div
+          id="result-message"
+          class="result-message"
+        ></div>
+
+
+      </div>
+
+
+    </div>
+
+
+  </main>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     Supabase
+     ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script src="supabase.js"></script>
+
+
+<!-- =====================================================
+     Ian OS 动态导航
+     ===================================================== -->
+
+<script src="nav.js"></script>
+
+
+<!-- =====================================================
+     销量数据导入逻辑
+     ===================================================== -->
+
+<script src="sales-import.js"></script>
+
+
+</body>
+
+</html>
