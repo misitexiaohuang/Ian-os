@@ -30,6 +30,10 @@
  * - 查询已有记录时改为分页读取
  * - 防止 77,308 条数据被错误判断成
  *   76,308 条新增 + 1,000 条更新
+ *
+ * 缓存联动：
+ * - Excel 成功导入后，自动更新销量数据版本号
+ * - sales.js 检测到版本号变化后，会自动放弃旧缓存
  */
 
 
@@ -40,6 +44,16 @@
 const SALES_TABLE = "sales_records";
 
 const BATCH_SIZE = 500;
+
+/*
+ * 销量分析页面的缓存版本号。
+ *
+ * 每次成功导入 Excel 后都会更新。
+ *
+ * sales.js 会读取这个值，
+ * 如果发现版本变化，就不会继续使用旧缓存。
+ */
+const SALES_CACHE_VERSION_KEY = "ian_os_sales_data_version";
 
 let parsedRecords = [];
 
@@ -75,7 +89,6 @@ function normalizeText(value) {
  * 2025.8
  * 2026.9
  */
-
 function isMonthlySheetName(name) {
   return /^\d{4}\.\d{1,2}$/.test(
     normalizeText(name)
@@ -88,7 +101,6 @@ function isMonthlySheetName(name) {
  *
  * 2026-09
  */
-
 function formatMonth(year, month) {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
@@ -103,7 +115,6 @@ function formatMonth(year, month) {
  *
  * 2026年09月
  */
-
 function formatMonthDisplay(month) {
   if (!month) {
     return "";
@@ -150,13 +161,11 @@ function formatMonthDisplay(month) {
  *   day
  * }
  */
-
 function dateToParts(value) {
 
   /*
    * Excel Serial Date
    */
-
   if (
     typeof value === "number" &&
     Number.isFinite(value)
@@ -184,7 +193,6 @@ function dateToParts(value) {
   /*
    * 字符串日期
    */
-
   const text =
     normalizeText(value);
 
@@ -212,7 +220,6 @@ function dateToParts(value) {
  *
  * YYYY-MM-DD
  */
-
 function toDateString(parts) {
 
   if (!parts) {
@@ -241,7 +248,6 @@ function toSalesNumber(value) {
   /*
    * 已经是数字
    */
-
   if (typeof value === "number") {
 
     return Number.isFinite(value)
@@ -253,13 +259,11 @@ function toSalesNumber(value) {
   /*
    * 字符串数字
    */
-
   const cleaned =
     String(value)
       .replace(/,/g, "")
       .replace(/\s/g, "")
       .trim();
-
 
   if (!cleaned) {
     return 0;
@@ -287,7 +291,6 @@ function isFormulaStorageRow(row) {
       .slice(0, 4)
       .map(normalizeText);
 
-
   return values.some(
     value => value === "公式存放行"
   );
@@ -306,7 +309,6 @@ function isValidDataRow(row) {
   /*
    * 产品名称不能为空
    */
-
   if (!productName) {
     return false;
   }
@@ -315,7 +317,6 @@ function isValidDataRow(row) {
   /*
    * 销售属性不能为空
    */
-
   if (!variant) {
     return false;
   }
@@ -324,7 +325,6 @@ function isValidDataRow(row) {
   /*
    * 排除公式存放行
    */
-
   if (isFormulaStorageRow(row)) {
     return false;
   }
@@ -362,7 +362,6 @@ function parseMonthlySheet(
   /*
    * Excel 转二维数组
    */
-
   const rows =
     XLSX.utils.sheet_to_json(
       worksheet,
@@ -404,7 +403,6 @@ function parseMonthlySheet(
    *
    * 从第 5 列开始寻找日期。
    */
-
   for (
     let columnIndex = 4;
     columnIndex < header.length;
@@ -423,14 +421,10 @@ function parseMonthlySheet(
 
 
     dateColumns.push({
-
       columnIndex,
-
       parts,
-
       date:
         toDateString(parts)
-
     });
   }
 
@@ -443,7 +437,6 @@ function parseMonthlySheet(
   /*
    * 遍历产品行
    */
-
   for (
     let rowIndex = 1;
     rowIndex < rows.length;
@@ -457,7 +450,6 @@ function parseMonthlySheet(
     /*
      * 无效行直接跳过
      */
-
     if (!isValidDataRow(row)) {
 
       skippedRows += 1;
@@ -482,7 +474,6 @@ function parseMonthlySheet(
     /*
      * 遍历日期列
      */
-
     for (const dateColumn of dateColumns) {
 
       const sales =
@@ -595,7 +586,6 @@ function buildPreview(workbook) {
   /*
    * 找到所有月份 Sheet
    */
-
   const monthlySheets =
     workbook.SheetNames.filter(
       isMonthlySheetName
@@ -618,7 +608,6 @@ function buildPreview(workbook) {
   /*
    * 逐个 Sheet 解析
    */
-
   for (
     const sheetName of monthlySheets
   ) {
@@ -644,7 +633,6 @@ function buildPreview(workbook) {
   /*
    * Excel 内部去重
    */
-
   parsedRecords =
     deduplicateRecords(
       allRecords
@@ -823,7 +811,6 @@ function renderPreview(summary) {
     statusElement.textContent =
       "已读取";
 
-
     statusElement.classList.add(
       "is-ready"
     );
@@ -844,6 +831,7 @@ function renderPreview(summary) {
     parsedSheets
       .map(
         item => `
+
           <div class="sheet-item">
 
             <div>
@@ -866,6 +854,7 @@ function renderPreview(summary) {
             </div>
 
           </div>
+
         `
       )
       .join("");
@@ -1230,7 +1219,6 @@ async function getExistingRecordKeys(
    */
 
   if (!records.length) {
-
     return existingKeys;
   }
 
@@ -1241,19 +1229,15 @@ async function getExistingRecordKeys(
 
   const dates =
     records
-
       .map(
         record =>
           record.sale_date
       )
-
       .filter(Boolean)
-
       .sort();
 
 
   if (!dates.length) {
-
     return existingKeys;
   }
 
@@ -1345,7 +1329,6 @@ async function getExistingRecordKeys(
      */
 
     if (error) {
-
       throw error;
     }
 
@@ -1459,8 +1442,44 @@ async function upsertBatch(
 
 
   if (error) {
-
     throw error;
+  }
+}
+
+
+/* =========================================================
+ * 通知销量分析页面：
+ * 数据已经发生变化
+ * ========================================================= */
+
+function updateSalesCacheVersion() {
+
+  const version =
+    String(Date.now());
+
+
+  try {
+
+    localStorage.setItem(
+      SALES_CACHE_VERSION_KEY,
+      version
+    );
+
+    console.log(
+      `销量数据缓存版本已更新：${version}`
+    );
+
+  } catch (error) {
+
+    /*
+     * localStorage 即使失败，
+     * 也不能影响已经成功完成的数据库导入。
+     */
+
+    console.warn(
+      "更新销量数据缓存版本失败：",
+      error
+    );
   }
 }
 
@@ -1660,21 +1679,37 @@ async function importRecords() {
    * =====================================================
    */
 
+  /*
+   * 非常重要：
+   *
+   * 只有所有 Upsert 全部成功之后，
+   * 才更新缓存版本号。
+   *
+   * 这样不会出现：
+   * 数据还没导完，
+   * sales.js 就认为缓存已经过期。
+   */
+
+  updateSalesCacheVersion();
+
+
   setProgress(
-  100,
-  `导入完成，共 ${total.toLocaleString()} 条`
-);
+    100,
+    `导入完成，共 ${total.toLocaleString()} 条`
+  );
 
-renderImportResult(
-  insertedCount,
-  updatedCount,
-  total
-);
 
-setResultMessage(
-  "",
-  ""
-);
+  renderImportResult(
+    insertedCount,
+    updatedCount,
+    total
+  );
+
+
+  setResultMessage(
+    "",
+    ""
+  );
 }
 
 

@@ -25,6 +25,334 @@
     href="sales.css"
   >
 
+
+  <!-- =========================
+       时间范围 / 日期选择器样式
+  ========================== -->
+
+  <style>
+
+    .date-range-controls {
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+
+    .range-buttons {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+
+    .range-button {
+      height:40px;
+
+      padding:0 14px;
+
+      border:1px solid #e5e5e5;
+      border-radius:10px;
+
+      background:#ffffff;
+      color:#111111;
+
+      font-size:14px;
+      font-weight:600;
+
+      cursor:pointer;
+
+      transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .15s ease;
+    }
+
+
+    .range-button:hover {
+      background:#f7f7f7;
+      border-color:#d5d5d5;
+    }
+
+
+    .range-button:active {
+      transform:scale(.98);
+    }
+
+
+    .range-button.active {
+      background:#111111;
+      border-color:#111111;
+      color:#ffffff;
+    }
+
+
+    /* =========================
+       自定义日期选择器
+    ========================== */
+
+    .date-picker-wrapper {
+      position:relative;
+    }
+
+
+    .custom-date-picker {
+      position:absolute;
+
+      top:calc(100% + 10px);
+      left:0;
+
+      width:330px;
+
+      padding:18px;
+
+      background:#ffffff;
+
+      border:1px solid #e5e5e5;
+      border-radius:16px;
+
+      box-shadow:
+        0 18px 50px rgba(0,0,0,.12);
+
+      z-index:1000;
+
+      opacity:0;
+      visibility:hidden;
+      transform:translateY(-6px);
+
+      transition:
+        opacity .18s ease,
+        transform .18s ease,
+        visibility .18s ease;
+    }
+
+
+    .custom-date-picker.is-visible {
+      opacity:1;
+      visibility:visible;
+      transform:translateY(0);
+    }
+
+
+    .date-picker-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+
+      margin-bottom:16px;
+    }
+
+
+    .date-picker-month {
+      font-size:15px;
+      font-weight:700;
+      color:#111111;
+    }
+
+
+    .date-picker-nav {
+      display:flex;
+      gap:4px;
+    }
+
+
+    .date-picker-nav button {
+      width:30px;
+      height:30px;
+
+      border:0;
+      border-radius:8px;
+
+      background:#f7f7f7;
+      color:#111111;
+
+      cursor:pointer;
+
+      font-size:16px;
+
+      transition:
+        background .15s ease;
+    }
+
+
+    .date-picker-nav button:hover {
+      background:#ededed;
+    }
+
+
+    .calendar-weekdays,
+    .calendar-days {
+      display:grid;
+      grid-template-columns:repeat(7, 1fr);
+    }
+
+
+    .calendar-weekdays {
+      margin-bottom:6px;
+    }
+
+
+    .calendar-weekday {
+      text-align:center;
+
+      font-size:11px;
+      font-weight:600;
+
+      color:#999999;
+
+      padding:5px 0;
+    }
+
+
+    .calendar-day {
+      position:relative;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      height:38px;
+
+      border:0;
+
+      background:transparent;
+
+      color:#222222;
+
+      font-size:13px;
+
+      cursor:pointer;
+
+      border-radius:8px;
+
+      z-index:1;
+
+      transition:
+        background .12s ease,
+        color .12s ease;
+    }
+
+
+    .calendar-day:hover {
+      background:#f2f2f2;
+    }
+
+
+    .calendar-day.other-month {
+      color:#cfcfcf;
+    }
+
+
+    .calendar-day.today {
+      font-weight:700;
+    }
+
+
+    .calendar-day.today::after {
+      content:"";
+
+      position:absolute;
+
+      bottom:4px;
+      left:50%;
+
+      width:3px;
+      height:3px;
+
+      border-radius:50%;
+
+      background:#111111;
+
+      transform:translateX(-50%);
+    }
+
+
+    .calendar-day.range-start,
+    .calendar-day.range-end {
+      background:#111111;
+      color:#ffffff;
+      font-weight:700;
+    }
+
+
+    .calendar-day.in-range {
+      background:#f1f1f1;
+      border-radius:0;
+    }
+
+
+    .calendar-day.range-preview {
+      background:#f1f1f1;
+      border-radius:0;
+    }
+
+
+    .calendar-day.range-start {
+      border-radius:8px 0 0 8px;
+    }
+
+
+    .calendar-day.range-end {
+      border-radius:0 8px 8px 0;
+    }
+
+
+    .calendar-day.range-start.range-end {
+      border-radius:8px;
+    }
+
+
+    .date-picker-footer {
+      margin-top:14px;
+      padding-top:13px;
+
+      border-top:1px solid #eeeeee;
+
+      font-size:12px;
+      color:#777777;
+    }
+
+
+    .date-picker-footer strong {
+      color:#111111;
+      font-weight:600;
+    }
+
+
+    /* =========================
+       移动端
+    ========================== */
+
+    @media (max-width:700px) {
+
+      .date-range-controls {
+        align-items:stretch;
+        width:100%;
+      }
+
+
+      .range-buttons {
+        width:100%;
+        flex-wrap:wrap;
+      }
+
+
+      .range-button {
+        flex:1;
+      }
+
+
+      .custom-date-picker {
+        width:calc(100vw - 40px);
+        max-width:330px;
+      }
+
+    }
+
+  </style>
+
 </head>
 
 
@@ -178,7 +506,7 @@
             </div>
 
             <div class="section-subtitle">
-              选择月份查看对应销量趋势
+              选择时间范围查看对应销量趋势
             </div>
 
           </div>
@@ -186,7 +514,14 @@
         </div>
 
 
-        <div class="filter-row">
+        <div
+          class="date-range-controls"
+        >
+
+
+          <!-- =========================
+               月份筛选
+          ========================== -->
 
           <div class="filter-item">
 
@@ -204,6 +539,197 @@
             </select>
 
           </div>
+
+
+
+          <!-- =========================
+               快捷时间范围
+          ========================== -->
+
+          <div class="range-buttons">
+
+            <button
+              type="button"
+              id="last-7-days"
+              class="range-button"
+            >
+              近7天
+            </button>
+
+
+            <button
+              type="button"
+              id="last-30-days"
+              class="range-button"
+            >
+              近30天
+            </button>
+
+
+            <!-- =========================
+                 自定义
+            ========================== -->
+
+            <div class="date-picker-wrapper">
+
+              <button
+                type="button"
+                id="custom-date-button"
+                class="range-button"
+              >
+                自定义
+              </button>
+
+
+              <!-- =========================
+                   自定义日期选择器
+              ========================== -->
+
+              <div
+                id="custom-date-picker"
+                class="custom-date-picker"
+              >
+
+
+                <!-- =========================
+                     日期选择器顶部
+                ========================== -->
+
+                <div class="date-picker-header">
+
+                  <div
+                    id="date-picker-month"
+                    class="date-picker-month"
+                  >
+                    2026年9月
+                  </div>
+
+
+                  <div class="date-picker-nav">
+
+                    <button
+                      type="button"
+                      id="prev-month"
+                      aria-label="上个月"
+                    >
+                      ‹
+                    </button>
+
+
+                    <button
+                      type="button"
+                      id="next-month"
+                      aria-label="下个月"
+                    >
+                      ›
+                    </button>
+
+                  </div>
+
+                </div>
+
+
+
+                <!-- =========================
+                     星期
+                ========================== -->
+
+                <div class="calendar-weekdays">
+
+                  <div class="calendar-weekday">
+                    日
+                  </div>
+
+                  <div class="calendar-weekday">
+                    一
+                  </div>
+
+                  <div class="calendar-weekday">
+                    二
+                  </div>
+
+                  <div class="calendar-weekday">
+                    三
+                  </div>
+
+                  <div class="calendar-weekday">
+                    四
+                  </div>
+
+                  <div class="calendar-weekday">
+                    五
+                  </div>
+
+                  <div class="calendar-weekday">
+                    六
+                  </div>
+
+                </div>
+
+
+
+                <!-- =========================
+                     日期
+                ========================== -->
+
+                <div
+                  id="calendar-days"
+                  class="calendar-days"
+                ></div>
+
+
+
+                <!-- =========================
+                     日期选择提示
+                ========================== -->
+
+                <div
+                  id="date-picker-footer"
+                  class="date-picker-footer"
+                >
+                  请点击<strong>开始日期</strong>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =========================
+               数据读取状态
+          ========================== -->
+
+          <div
+            id="data-status"
+            class="status-badge"
+            style="
+              margin-bottom:2px;
+              white-space:nowrap;
+            "
+          >
+            读取中
+          </div>
+
+
+
+          <!-- =========================
+               当前数据读取提示
+          ========================== -->
+
+          <div
+            id="sales-message"
+            class="sales-message"
+            style="
+              margin:0;
+              padding:0;
+              min-height:0;
+              flex:1;
+            "
+          ></div>
+
 
         </div>
 
@@ -236,14 +762,6 @@
               等待读取数据
             </div>
 
-          </div>
-
-
-          <div
-            id="data-status"
-            class="status-badge"
-          >
-            读取中
           </div>
 
         </div>
@@ -327,7 +845,7 @@
               id="daily-chart-subtitle"
               class="section-subtitle"
             >
-              查看当前月份每天的总销量变化
+              查看当前时间范围每天的总销量变化
             </div>
 
           </div>
@@ -413,18 +931,6 @@
 
       <!-- =========================
            Variant 销量趋势
-
-           产品
-              ↓
-           颜色
-              ↓
-           尺码
-
-           产品 + 颜色
-           = 该颜色所有尺码的每日销量
-
-           产品 + 颜色 + 尺码
-           = 精确到该 Variant 的每日销量
       ========================== -->
 
       <div class="tool-card">
@@ -548,17 +1054,6 @@
       </div>
 
 
-
-      <!-- =========================
-           页面状态信息
-      ========================== -->
-
-      <div
-        id="sales-message"
-        class="sales-message"
-      ></div>
-
-
     </div>
 
   </main>
@@ -591,6 +1086,897 @@
 ========================== -->
 
 <script src="sales.js"></script>
+
+
+
+<!-- =========================
+     自定义日期选择器交互
+========================== -->
+
+<script>
+
+(function () {
+
+  const customButton =
+    document.getElementById(
+      "custom-date-button"
+    );
+
+
+  const picker =
+    document.getElementById(
+      "custom-date-picker"
+    );
+
+
+  const calendarDays =
+    document.getElementById(
+      "calendar-days"
+    );
+
+
+  const pickerMonth =
+    document.getElementById(
+      "date-picker-month"
+    );
+
+
+  const pickerFooter =
+    document.getElementById(
+      "date-picker-footer"
+    );
+
+
+  const prevMonth =
+    document.getElementById(
+      "prev-month"
+    );
+
+
+  const nextMonth =
+    document.getElementById(
+      "next-month"
+    );
+
+
+  if (
+    !customButton ||
+    !picker ||
+    !calendarDays ||
+    !pickerMonth ||
+    !pickerFooter ||
+    !prevMonth ||
+    !nextMonth
+  ) {
+    return;
+  }
+
+
+  let viewDate =
+    new Date();
+
+
+  let startDate =
+    null;
+
+
+  let endDate =
+    null;
+
+
+  let hoverDate =
+    null;
+
+
+
+  /* =========================
+     日期格式化
+  ========================== */
+
+  function formatDate(date) {
+
+    if (!date) {
+      return "";
+    }
+
+
+    const year =
+      date.getFullYear();
+
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(2, "0");
+
+
+    return `${year}-${month}-${day}`;
+
+  }
+
+
+
+  /* =========================
+     日期标准化
+  ========================== */
+
+  function normalizeDate(date) {
+
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+  }
+
+
+
+  /* =========================
+     判断两个日期是否相同
+  ========================== */
+
+  function isSameDate(a, b) {
+
+    if (!a || !b) {
+      return false;
+    }
+
+
+    return (
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate()
+    );
+
+  }
+
+
+
+  /* =========================
+     判断日期是否处于范围
+  ========================== */
+
+  function isBetween(
+    date,
+    start,
+    end
+  ) {
+
+    if (
+      !start ||
+      !end
+    ) {
+      return false;
+    }
+
+
+    return (
+      date > start &&
+      date < end
+    );
+
+  }
+
+
+
+  /* =========================
+     清除鼠标预览
+  ========================== */
+
+  function clearPreviewClasses() {
+
+    const days =
+      calendarDays.querySelectorAll(
+        ".calendar-day"
+      );
+
+
+    days.forEach(
+      function (day) {
+
+        day.classList.remove(
+          "range-preview"
+        );
+
+      }
+    );
+
+  }
+
+
+
+  /* =========================
+     更新鼠标范围预览
+     
+     注意：
+     不重新生成整个日历
+  ========================== */
+
+  function updateHoverPreview() {
+
+    if (
+      !startDate ||
+      endDate ||
+      !hoverDate
+    ) {
+      return;
+    }
+
+
+    clearPreviewClasses();
+
+
+    const minDate =
+      startDate < hoverDate
+        ? startDate
+        : hoverDate;
+
+
+    const maxDate =
+      startDate > hoverDate
+        ? startDate
+        : hoverDate;
+
+
+    const days =
+      calendarDays.querySelectorAll(
+        ".calendar-day"
+      );
+
+
+    days.forEach(
+      function (day) {
+
+        const timestamp =
+          Number(
+            day.dataset.timestamp
+          );
+
+
+        if (!timestamp) {
+          return;
+        }
+
+
+        const cellDate =
+          new Date(
+            timestamp
+          );
+
+
+        if (
+          cellDate > minDate &&
+          cellDate < maxDate
+        ) {
+
+          day.classList.add(
+            "range-preview"
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+
+  /* =========================
+     渲染日期
+  ========================== */
+
+  function renderCalendar() {
+
+    const year =
+      viewDate.getFullYear();
+
+
+    const month =
+      viewDate.getMonth();
+
+
+    pickerMonth.textContent =
+      `${year}年${month + 1}月`;
+
+
+    calendarDays.innerHTML =
+      "";
+
+
+    const firstDay =
+      new Date(
+        year,
+        month,
+        1
+      );
+
+
+    const firstWeekday =
+      firstDay.getDay();
+
+
+    const daysInMonth =
+      new Date(
+        year,
+        month + 1,
+        0
+      ).getDate();
+
+
+    const previousMonthDays =
+      new Date(
+        year,
+        month,
+        0
+      ).getDate();
+
+
+    const today =
+      normalizeDate(
+        new Date()
+      );
+
+
+
+    /* =========================
+       一共生成42个格子
+    ========================== */
+
+    for (
+      let i = 0;
+      i < 42;
+      i++
+    ) {
+
+      let dayNumber;
+
+      let cellDate;
+
+      let isOtherMonth =
+        false;
+
+
+
+      /* =========================
+         上个月日期
+      ========================== */
+
+      if (
+        i < firstWeekday
+      ) {
+
+        dayNumber =
+          previousMonthDays -
+          firstWeekday +
+          i +
+          1;
+
+
+        cellDate =
+          new Date(
+            year,
+            month - 1,
+            dayNumber
+          );
+
+
+        isOtherMonth =
+          true;
+
+      }
+
+
+
+      /* =========================
+         当前月份
+      ========================== */
+
+      else if (
+        i <
+        firstWeekday +
+        daysInMonth
+      ) {
+
+        dayNumber =
+          i -
+          firstWeekday +
+          1;
+
+
+        cellDate =
+          new Date(
+            year,
+            month,
+            dayNumber
+          );
+
+      }
+
+
+
+      /* =========================
+         下个月日期
+      ========================== */
+
+      else {
+
+        dayNumber =
+          i -
+          firstWeekday -
+          daysInMonth +
+          1;
+
+
+        cellDate =
+          new Date(
+            year,
+            month + 1,
+            dayNumber
+          );
+
+
+        isOtherMonth =
+          true;
+
+      }
+
+
+      cellDate =
+        normalizeDate(
+          cellDate
+        );
+
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "calendar-day";
+
+
+      button.textContent =
+        dayNumber;
+
+
+      button.dataset.timestamp =
+        String(
+          cellDate.getTime()
+        );
+
+
+
+      /* =========================
+         非当前月份
+      ========================== */
+
+      if (
+        isOtherMonth
+      ) {
+
+        button.classList.add(
+          "other-month"
+        );
+
+      }
+
+
+
+      /* =========================
+         今天
+      ========================== */
+
+      if (
+        isSameDate(
+          cellDate,
+          today
+        )
+      ) {
+
+        button.classList.add(
+          "today"
+        );
+
+      }
+
+
+
+      /* =========================
+         开始日期
+      ========================== */
+
+      if (
+        startDate &&
+        isSameDate(
+          cellDate,
+          startDate
+        )
+      ) {
+
+        button.classList.add(
+          "range-start"
+        );
+
+      }
+
+
+
+      /* =========================
+         结束日期
+      ========================== */
+
+      if (
+        endDate &&
+        isSameDate(
+          cellDate,
+          endDate
+        )
+      ) {
+
+        button.classList.add(
+          "range-end"
+        );
+
+      }
+
+
+
+      /* =========================
+         已确定范围
+      ========================== */
+
+      if (
+        isBetween(
+          cellDate,
+          startDate,
+          endDate
+        )
+      ) {
+
+        button.classList.add(
+          "in-range"
+        );
+
+      }
+
+
+
+      /* =========================
+         当前鼠标预览
+      ========================== */
+
+      if (
+        startDate &&
+        !endDate &&
+        hoverDate
+      ) {
+
+        const minDate =
+          startDate < hoverDate
+            ? startDate
+            : hoverDate;
+
+
+        const maxDate =
+          startDate > hoverDate
+            ? startDate
+            : hoverDate;
+
+
+        if (
+          cellDate > minDate &&
+          cellDate < maxDate
+        ) {
+
+          button.classList.add(
+            "range-preview"
+          );
+
+        }
+
+      }
+
+
+
+      /* =========================
+         鼠标移动
+         
+         只更新CSS
+         不重新生成DOM
+      ========================== */
+
+      button.addEventListener(
+        "mouseenter",
+        function () {
+
+          if (
+            startDate &&
+            !endDate
+          ) {
+
+            hoverDate =
+              normalizeDate(
+                cellDate
+              );
+
+
+            updateHoverPreview();
+
+          }
+
+        }
+      );
+
+
+
+      /* =========================
+         点击日期
+      ========================== */
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          const clickedDate =
+            normalizeDate(
+              cellDate
+            );
+
+
+
+          /* =========================
+             第一次点击
+          ========================== */
+
+          if (
+            !startDate ||
+            endDate
+          ) {
+
+            startDate =
+              clickedDate;
+
+
+            endDate =
+              null;
+
+
+            hoverDate =
+              null;
+
+
+            pickerFooter.innerHTML =
+              "请选择<strong>结束日期</strong>";
+
+
+            renderCalendar();
+
+
+            return;
+
+          }
+
+
+
+          /* =========================
+             第二次点击
+          ========================== */
+
+          if (
+            clickedDate <
+            startDate
+          ) {
+
+            endDate =
+              startDate;
+
+
+            startDate =
+              clickedDate;
+
+          } else {
+
+            endDate =
+              clickedDate;
+
+          }
+
+
+          hoverDate =
+            null;
+
+
+
+          /* =========================
+             更新底部提示
+          ========================== */
+
+          pickerFooter.innerHTML =
+            `已选择 <strong>${formatDate(startDate)}</strong> → <strong>${formatDate(endDate)}</strong>`;
+
+
+          /* =========================
+             更新按钮文字
+          ========================== */
+
+          customButton.textContent =
+            `${formatDate(startDate)} → ${formatDate(endDate)}`;
+
+
+          customButton.classList.add(
+            "active"
+          );
+
+
+          /* =========================
+             显示最终范围
+          ========================== */
+
+          renderCalendar();
+
+
+          /* =========================
+             稍微延迟关闭
+          ========================== */
+
+          setTimeout(
+            function () {
+
+              picker.classList.remove(
+                "is-visible"
+              );
+
+            },
+            250
+          );
+
+        }
+      );
+
+
+      calendarDays.appendChild(
+        button
+      );
+
+    }
+
+  }
+
+
+
+  /* =========================
+     点击自定义
+  ========================== */
+
+  customButton.addEventListener(
+    "click",
+    function (event) {
+
+      event.stopPropagation();
+
+
+      picker.classList.toggle(
+        "is-visible"
+      );
+
+
+      if (
+        picker.classList.contains(
+          "is-visible"
+        )
+      ) {
+
+        renderCalendar();
+
+      }
+
+    }
+  );
+
+
+
+  /* =========================
+     防止点击日期选择器
+     导致外部关闭
+  ========================== */
+
+  picker.addEventListener(
+    "click",
+    function (event) {
+
+      event.stopPropagation();
+
+    }
+  );
+
+
+
+  /* =========================
+     点击外部关闭
+  ========================== */
+
+  document.addEventListener(
+    "click",
+    function () {
+
+      picker.classList.remove(
+        "is-visible"
+      );
+
+    }
+  );
+
+
+
+  /* =========================
+     上个月
+  ========================== */
+
+  prevMonth.addEventListener(
+    "click",
+    function () {
+
+      viewDate =
+        new Date(
+          viewDate.getFullYear(),
+          viewDate.getMonth() - 1,
+          1
+        );
+
+
+      renderCalendar();
+
+    }
+  );
+
+
+
+  /* =========================
+     下个月
+  ========================== */
+
+  nextMonth.addEventListener(
+    "click",
+    function () {
+
+      viewDate =
+        new Date(
+          viewDate.getFullYear(),
+          viewDate.getMonth() + 1,
+          1
+        );
+
+
+      renderCalendar();
+
+    }
+  );
+
+
+
+  /* =========================
+     初始化
+  ========================== */
+
+  renderCalendar();
+
+})();
+
+</script>
 
 
 </body>
