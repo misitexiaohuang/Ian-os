@@ -124,25 +124,42 @@
         </div>
 
 
-        <div class="upload-box">
+        <!-- =================================================
+     Excel 文件上传区域：整个框支持拖拽
+================================================= -->
+<div
+  class="upload-box"
+  id="excel-drop-zone"
+  role="button"
+  tabindex="0"
+  aria-label="拖入或选择 Excel 文件"
+>
+  <input
+    id="excel-file"
+    type="file"
+    accept=".xlsx,.xls,.xlsm"
+  >
 
+  <div class="upload-drop-content">
+    <div class="upload-drop-icon">📂</div>
 
-          <input
-            id="excel-file"
-            type="file"
-            accept=".xlsx,.xls,.xlsm"
-          >
+    <div class="upload-drop-title">
+      拖拽 Excel 文件到这里
+    </div>
 
+    <div class="upload-drop-desc">
+      点击选择文件，或将 Excel 文件拖入整个框内
+    </div>
 
-          <div class="upload-tip">
+    <div class="upload-tip">
+      支持腾讯文档导出的 Excel 文件。系统只读取 2025.7、2025.8 …… 这种月度销量 Sheet。
+    </div>
 
-            支持腾讯文档导出的 Excel 文件。
-            系统只读取 2025.7、2025.8 …… 这种月度销量 Sheet。
-
-          </div>
-
-
-        </div>
+    <div id="selected-file-name" class="selected-file-name">
+      尚未选择文件
+    </div>
+  </div>
+</div>
 
 
 

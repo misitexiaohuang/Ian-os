@@ -1871,49 +1871,136 @@ async function handleImport() {
  * 页面初始化
  * ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .getElementById("preview-btn")
+    .addEventListener("click", handlePreview);
 
-    /*
-     * 读取并预览
-     */
+  document
+    .getElementById("import-btn")
+    .addEventListener("click", handleImport);
 
-    document
-      .getElementById(
-        "preview-btn"
-      )
-      .addEventListener(
-        "click",
-        handlePreview
-      );
+  // 初始化 Excel 拖拽上传功能
+  initExcelDragAndDrop();
 
-
-    /*
-     * 开始导入
-     */
-
-    document
-      .getElementById(
-        "import-btn"
-      )
-      .addEventListener(
-        "click",
-        handleImport
-      );
-
-
-    /*
-     * 检查 Supabase
-     */
-
-    if (
-      !getSupabaseClient()
-    ) {
-
-      console.warn(
-        "销量导入页面加载时未检测到 Supabase 客户端，请确认 supabase.js 配置正常。"
-      );
-    }
+  if (!getSupabaseClient()) {
+    console.warn(
+      "销量导入页面加载时未检测到 Supabase 客户端，请确认 supabase.js 配置正常。"
+    );
   }
-);
+});
+
+/* =================================================
+   Excel 文件拖拽上传
+   整个上传框都可以拖入文件
+================================================= */
+
+function initExcelDragAndDrop() {
+  const dropZone = document.getElementById("excel-drop-zone");
+  const fileInput = document.getElementById("excel-file");
+  const fileNameDisplay = document.getElementById("selected-file-name");
+
+  if (!dropZone || !fileInput) {
+    return;
+  }
+
+  // 只接受 Excel 文件
+  function isExcelFile(file) {
+    if (!file) return false;
+
+    return /\.(xlsx|xls|xlsm)$/i.test(file.name);
+  }
+
+  // 更新文件名显示
+  function updateFileName(file) {
+    if (!fileNameDisplay) return;
+
+    fileNameDisplay.textContent = file
+      ? `已选择：${file.name}`
+      : "尚未选择文件";
+  }
+
+  // 处理选中文件
+  function setSelectedFile(file) {
+    if (!file) return;
+
+    if (!isExcelFile(file)) {
+      if (fileNameDisplay) {
+        fileNameDisplay.textContent = "文件格式不正确，请选择 Excel 文件";
+      }
+
+      return;
+    }
+
+    // 使用 DataTransfer 将拖入的文件赋给 file input
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+
+    fileInput.files = dataTransfer.files;
+
+    // 触发 change 事件，兼容原有文件选择逻辑
+    fileInput.dispatchEvent(new Event("change", {
+      bubbles: true
+    }));
+
+    updateFileName(file);
+  }
+
+  // 手动选择文件时更新文件名
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files && fileInput.files[0];
+    updateFileName(file);
+  });
+
+  // 整个框监听拖拽进入
+  ["dragenter", "dragover"].forEach(eventName => {
+    dropZone.addEventListener(eventName, event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      dropZone.classList.add("dragover");
+
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "copy";
+      }
+    });
+  });
+
+  // 拖出或放下时取消高亮
+  ["dragleave", "dragend"].forEach(eventName => {
+    dropZone.addEventListener(eventName, event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      dropZone.classList.remove("dragover");
+    });
+  });
+
+  // 文件放入整个上传框
+  dropZone.addEventListener("drop", event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    dropZone.classList.remove("dragover");
+
+    const files = event.dataTransfer && event.dataTransfer.files;
+
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    // 当前销量导入逻辑按单个 Excel 文件处理
+    setSelectedFile(files[0]);
+  });
+
+  // 防止文件拖到页面其他位置时被浏览器直接打开
+  document.addEventListener("dragover", event => {
+    event.preventDefault();
+  });
+
+  document.addEventListener("drop", event => {
+    if (!dropZone.contains(event.target)) {
+      event.preventDefault();
+    }
+  });
+}
