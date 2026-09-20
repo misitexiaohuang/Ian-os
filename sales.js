@@ -1024,226 +1024,100 @@ async function loadMonthRange(
 
 /* =========================================================
    获取某个月全部数据
+   修复：分页使用 sale_date + id 稳定排序
 ========================================================= */
 
-async function loadMonthRecords(
-  client,
-  month
-) {
+async function loadMonthRecords(client, month) {
+  const currentVersion = getSalesCacheVersion();
 
-  /*
-    1. 内存缓存
+  // 1. 检查内存缓存
+  if (monthCache.has(month)) {
+    const memoryItem = monthCache.get(month);
 
-    内存缓存也要检查版本。
-    防止页面打开期间数据库已经更新。
-  */
-
-  const currentVersion =
-    getSalesCacheVersion();
-
-
-  if (
-    monthCache.has(month)
-  ) {
-
-    const memoryItem =
-      monthCache.get(month);
-
-
-    /*
-      兼容旧的 Map 数据格式。
-    */
-
-    if (
-      Array.isArray(memoryItem)
-    ) {
-
-      return memoryItem;
-
-    }
-
-
-    if (
+    // 兼容旧格式：旧数组缓存直接作废，避免继续使用无法校验版本的数据
+    if (Array.isArray(memoryItem)) {
+      monthCache.delete(month);
+    } else if (
       memoryItem &&
-      Array.isArray(
-        memoryItem.records
-      )
+      Array.isArray(memoryItem.records) &&
+      (!currentVersion || memoryItem.version === currentVersion)
     ) {
-
-      if (
-        !currentVersion ||
-        memoryItem.version ===
-          currentVersion
-      ) {
-
-        return memoryItem.records;
-
-      }
-
+      return memoryItem.records;
+    } else {
+      monthCache.delete(month);
     }
-
-
-    monthCache.delete(
-      month
-    );
-
   }
 
+  // 2. 检查 IndexedDB 缓存
+  const cachedRecords = await getCachedMonth(month);
 
-  /*
-    2. IndexedDB
-  */
-
-  const cachedRecords =
-    await getCachedMonth(
-      month
-    );
-
-
-  if (
-    cachedRecords &&
-    cachedRecords.length
-  ) {
-
+  if (cachedRecords && cachedRecords.length) {
     console.log(
       `使用本地缓存：${month}，${cachedRecords.length} 条`
     );
 
-
-    monthCache.set(
-      month,
-      {
-        records:
-          cachedRecords,
-
-        version:
-          getSalesCacheVersion()
-      }
-    );
-
+    monthCache.set(month, {
+      records: cachedRecords,
+      version: getSalesCacheVersion()
+    });
 
     return cachedRecords;
-
   }
 
-
-  /*
-    3. Supabase
-  */
-
-  console.log(
-    `从 Supabase 读取：${month}`
-  );
-
+  // 3. 从 Supabase 分页读取
+  console.log(`从 Supabase 读取：${month}`);
 
   const records = [];
-
   let from = 0;
 
-
   while (true) {
+    const to = from + PAGE_SIZE - 1;
 
-    const to =
-      from + PAGE_SIZE - 1;
-
-
-    const {
-      data,
-      error
-    } = await client
-
+    const { data, error } = await client
       .from(SALES_TABLE)
-
       .select(`
+        id,
         sale_date,
         month,
         product_name,
         variant,
         sales
       `)
-
-      .eq(
-        "month",
-        month
-      )
-
-      .order(
-        "sale_date",
-        {
-          ascending: true
-        }
-      )
-
-      .range(
-        from,
-        to
-      );
-
+      .eq("month", month)
+      .order("sale_date", { ascending: true })
+      .order("id", { ascending: true })
+      .range(from, to);
 
     if (error) {
       throw error;
     }
 
-
-    if (
-      !data ||
-      data.length === 0
-    ) {
-
+    if (!data || data.length === 0) {
       break;
-
     }
 
+    records.push(...data.map(normalizeRecord));
 
-    records.push(
-      ...data.map(
-        normalizeRecord
-      )
-    );
-
-
-    if (
-      data.length < PAGE_SIZE
-    ) {
-
+    if (data.length < PAGE_SIZE) {
       break;
-
     }
-
 
     from += PAGE_SIZE;
-
   }
 
+  // 4. 保存读取结果
+  const normalizedRecords = records.map(normalizeRecord);
 
-  const normalizedRecords =
-    records.map(
-      normalizeRecord
-    );
+  monthCache.set(month, {
+    records: normalizedRecords,
+    version: getSalesCacheVersion()
+  });
 
-
-  monthCache.set(
-    month,
-    {
-      records:
-        normalizedRecords,
-
-      version:
-        getSalesCacheVersion()
-    }
-  );
-
-
-  await saveCachedMonth(
-    month,
-    normalizedRecords
-  );
-
+  await saveCachedMonth(month, normalizedRecords);
 
   console.log(
-    `已缓存：${month}，${normalizedRecords.length} 条`
+    `已读取并缓存：${month}，${normalizedRecords.length} 条`
   );
-
 
   return normalizedRecords;
 }
@@ -1446,231 +1320,120 @@ function createRefreshButton() {
 
 /* =========================================================
    手动刷新当前月份
+   修复：与普通读取使用相同的稳定分页排序
 ========================================================= */
 
 async function refreshCurrentMonth() {
-
   if (!currentMonth) {
     return;
   }
 
+  const monthToRefresh = currentMonth;
 
-  const message =
-    document.getElementById(
-      "sales-message"
-    );
-
-
-  const button =
-    document.getElementById(
-      "sales-refresh-button"
-    );
-
+  const message = document.getElementById("sales-message");
+  const button = document.getElementById("sales-refresh-button");
 
   try {
-
     if (button) {
-
-      button.disabled =
-        true;
-
-      button.textContent =
-        "↻ 刷新中...";
-
-      button.style.opacity =
-        "0.6";
-
-      button.style.cursor =
-        "default";
-
+      button.disabled = true;
+      button.textContent = "↻ 刷新中...";
+      button.style.opacity = "0.6";
+      button.style.cursor = "default";
     }
-
 
     if (message) {
-
       message.textContent =
-        `正在从 Supabase 刷新 ${currentMonth} 数据...`;
-
+        `正在从 Supabase 刷新 ${monthToRefresh} 数据...`;
     }
 
+    // 删除该月份的旧缓存
+    monthCache.delete(monthToRefresh);
+    await deleteCachedMonth(monthToRefresh);
 
-    monthCache.delete(
-      currentMonth
-    );
-
-
-    await deleteCachedMonth(
-      currentMonth
-    );
-
-
-    const client =
-      await getSalesClient();
-
+    const client = await getSalesClient();
 
     const records = [];
-
     let from = 0;
 
-
+    // 分页读取，排序规则必须与 loadMonthRecords 一致
     while (true) {
+      const to = from + PAGE_SIZE - 1;
 
-      const to =
-        from + PAGE_SIZE - 1;
-
-
-      const {
-        data,
-        error
-      } = await client
-
+      const { data, error } = await client
         .from(SALES_TABLE)
-
         .select(`
+          id,
           sale_date,
           month,
           product_name,
           variant,
           sales
         `)
-
-        .eq(
-          "month",
-          currentMonth
-        )
-
-        .order(
-          "sale_date",
-          {
-            ascending: true
-          }
-        )
-
-        .range(
-          from,
-          to
-        );
-
+        .eq("month", monthToRefresh)
+        .order("sale_date", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, to);
 
       if (error) {
         throw error;
       }
 
-
-      if (
-        !data ||
-        data.length === 0
-      ) {
-
+      if (!data || data.length === 0) {
         break;
-
       }
 
+      records.push(...data.map(normalizeRecord));
 
-      records.push(
-        ...data.map(
-          normalizeRecord
-        )
-      );
-
-
-      if (
-        data.length < PAGE_SIZE
-      ) {
-
+      if (data.length < PAGE_SIZE) {
         break;
-
       }
-
 
       from += PAGE_SIZE;
-
     }
 
+    const normalizedRecords = records.map(normalizeRecord);
 
-    monthCache.set(
-      currentMonth,
-      {
-        records,
+    // 更新内存缓存和 IndexedDB
+    monthCache.set(monthToRefresh, {
+      records: normalizedRecords,
+      version: getSalesCacheVersion()
+    });
 
-        version:
-          getSalesCacheVersion()
+    await saveCachedMonth(monthToRefresh, normalizedRecords);
+
+    // 只有刷新的是当前选中月份，才更新当前页面数据
+    if (currentMonth === monthToRefresh) {
+      currentMonthRecords = normalizedRecords;
+
+      if (currentDateRange.type === "month") {
+        renderCurrentRange();
+      } else {
+        await applyCurrentDateRange();
       }
-    );
-
-
-    await saveCachedMonth(
-      currentMonth,
-      records
-    );
-
-
-    currentMonthRecords =
-      records;
-
-
-    /*
-      刷新后重新应用当前时间范围
-    */
-
-    if (
-      currentDateRange.type ===
-      "month"
-    ) {
-
-      renderCurrentRange();
-
-    } else {
-
-      await applyCurrentDateRange();
-
     }
-
 
     if (message) {
-
       message.textContent =
-        `${currentMonth} 数据刷新完成`;
-
+        `${monthToRefresh} 数据刷新完成，共 ${normalizedRecords.length} 条记录`;
     }
 
-
+    console.log(
+      `${monthToRefresh} 刷新完成，共 ${normalizedRecords.length} 条记录`
+    );
   } catch (error) {
-
-    console.error(
-      "刷新销量数据失败：",
-      error
-    );
-
+    console.error("刷新销量数据失败：", error);
 
     if (message) {
-
       message.textContent =
-        `刷新失败：${
-          error.message || error
-        }`;
-
+        `刷新失败：${error.message || error}`;
     }
-
-
   } finally {
-
     if (button) {
-
-      button.disabled =
-        false;
-
-      button.textContent =
-        "↻ 刷新数据";
-
-      button.style.opacity =
-        "1";
-
-      button.style.cursor =
-        "pointer";
-
+      button.disabled = false;
+      button.textContent = "↻ 刷新数据";
+      button.style.opacity = "1";
+      button.style.cursor = "pointer";
     }
-
   }
 }
 
